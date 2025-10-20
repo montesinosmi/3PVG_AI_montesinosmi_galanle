@@ -8,11 +8,11 @@
 #include "Libs/imgui/backends/imgui_impl_sdl2.h"
 #include "Libs/imgui/backends/imgui_impl_sdlrenderer2.h"
 
-const float scale = 1.5f;
+const float scale = 2.0f;
 const int kWindowHeight = 500 * scale, kWindowWidth = 500 * scale;
 const int kMapHeight = 50, kMapWidth = 50;
 const int texsize = 10;
-const int kRunnerQuantity = 10;
+const int kRunnerQuantity = 1000;
 
 SDL_Texture* roomtex = nullptr;
 SDL_Texture* walltex = nullptr;
@@ -42,7 +42,9 @@ struct runners{
   int x, y;
   slab lastvisited;
   int r, g, b;
+  int behaviour = 0;
   int state = 1;
+  int direction = 0;
 };
 
 runners runners[kRunnerQuantity];
@@ -64,6 +66,8 @@ void InitRunners(){
     }
   }
   for(int i = 0; i < kRunnerQuantity; i++){
+    runners[i].behaviour = 1;
+    runners[i].direction = 0;
     runners[i].state = 1;
     int spawnPos = rand() % SpawnCellQuantity;
     runners[i].x = spawnSlabs[spawnPos].x;
@@ -130,7 +134,7 @@ void InitTextures() {
   roomtex = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_FreeSurface(surface);
 
-  surface = IMG_Load("Resources/Runner.png");
+  surface = IMG_Load("Resources/Mario.png");
   if (!surface) {
     printf("\nError loading npc texture");
   }
@@ -179,7 +183,7 @@ void InitTextures() {
   victorytex = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_FreeSurface(surface);
 
-  surface = IMG_Load("Resources/Spawn.png");
+  surface = IMG_Load("Resources/Pipe.png");
   if (!surface) {
     printf("\nError loading spawn texture");
   }
@@ -202,7 +206,7 @@ void InitSDL2(){
   InitTextures();
 }
 
-void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, int r = 255, int g = 255, int b = 255)
+void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, int r = 255, int g = 255, int b = 255, bool flipX = false, bool flipY = false)
 {
   if (!texture) return;
 
@@ -214,7 +218,16 @@ void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, int r 
   destRect.w = static_cast<int>(texsize * scale);
   destRect.h = static_cast<int>(texsize * scale);
 
-  SDL_RenderCopy(renderer, texture, nullptr, &destRect);
+  SDL_RendererFlip flip = SDL_FLIP_NONE;
+    if (flipX && flipY){
+      flip = (SDL_RendererFlip)(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+    }else if (flipX){
+      flip = SDL_FLIP_HORIZONTAL;
+    }else if (flipY){
+      flip = SDL_FLIP_VERTICAL;
+    }
+
+  SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, 0.0, nullptr, flip);
   SDL_SetTextureColorMod(texture, 255, 255, 255);
 }
 
@@ -239,6 +252,7 @@ void DrawMaze(){
         }
         break;
         case 5:
+        DrawCell(renderer, roomtex, j * texsize * scale, i * texsize * scale, slabs[i][j].r, slabs[i][j].g, slabs[i][j].b);
         DrawCell(renderer, spawntex, j * texsize * scale, i * texsize * scale);
         break;
       }
@@ -252,9 +266,19 @@ void DrawRunners(){
       case 0:
       DrawCell(renderer, deadtex, runners[i].x * texsize * scale, runners[i].y * texsize * scale);
       break;
+
       case 1:
-      DrawCell(renderer, npctex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, runners[i].r, runners[i].g, runners[i].b);
+        switch(runners[i].direction){
+          case 0:
+          DrawCell(renderer, npctex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, 255, 255, 255, true);
+          break;
+          case 1:
+          DrawCell(renderer, npctex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, 255, 255, 255, false);
+          break;
+        }
+      
       break;
+
       case 2:
       DrawCell(renderer, victorytex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, runners[i].r, runners[i].g, runners[i].b);
       break;
@@ -265,42 +289,55 @@ void UpdateRunners(){
   if(CurrentRunnerTime >= RunnerTimer){
     for(int i = 0; i < kRunnerQuantity; i++){
       if(runners[i].state == 1){
+        switch(runners[i].behaviour){
+        case 0:
+        break;
+        case 1:
 
-        int x = runners[i].x;
-        int y = runners[i].y;
-        slab top = slabs[y - 1][x];
-        slab bottom = slabs[y + 1][x];
-        slab left = slabs[y][x - 1];
-        slab right = slabs[y][x + 1];
-        int choices = 0;
-        slab possibleslabs[4];
-        if(top.type != 0 && top.transitable && top.id != runners[i].lastvisited.id){
-          possibleslabs[choices] = top;
-          choices++;
+          int x = runners[i].x;
+          int y = runners[i].y;
+          slab top = slabs[y - 1][x];
+          slab bottom = slabs[y + 1][x];
+          slab left = slabs[y][x - 1];
+          slab right = slabs[y][x + 1];
+          int choices = 0;
+          slab possibleslabs[4];
+          int dir[4];
+          if(top.type != 0 && top.transitable && top.id != runners[i].lastvisited.id){
+            possibleslabs[choices] = top;
+            choices++;
+          }
+          if(bottom.type != 0 && bottom.transitable && bottom.id != runners[i].lastvisited.id){
+            possibleslabs[choices] = bottom;
+            choices++;
+          }
+          if(left.type != 0 && left.transitable && left.id != runners[i].lastvisited.id){
+            possibleslabs[choices] = left;
+            dir[choices] = 0;
+            choices++;
+          }
+          if(right.type != 0 && right.transitable && right.id != runners[i].lastvisited.id){
+            possibleslabs[choices] = right;
+            dir[choices] = 1;
+            choices++;
+          }
+          int nextSlab = 0;
+          if(choices != 0){
+            nextSlab = rand() % choices;
+            runners[i].x = possibleslabs[nextSlab].x;
+            runners[i].y = possibleslabs[nextSlab].y;
+            runners[i].direction = dir[nextSlab];
+            runners[i].lastvisited.id = possibleslabs[nextSlab].id;
+          }else{
+            runners[i].lastvisited.id = -1;
+          }
+          if(possibleslabs[nextSlab].type == 2){
+            runners[i].state = 2;
+          }
+
+          break;
         }
-        if(bottom.type != 0 && bottom.transitable && bottom.id != runners[i].lastvisited.id){
-          possibleslabs[choices] = bottom;
-          choices++;
-        }
-        if(left.type != 0 && left.transitable && left.id != runners[i].lastvisited.id){
-          possibleslabs[choices] = left;
-          choices++;
-        }
-        if(right.type != 0 && right.transitable && right.id != runners[i].lastvisited.id){
-          possibleslabs[choices] = right;
-          choices++;
-        }
-        int nextSlab = rand() % choices;
-        if(choices != 0){
-          runners[i].x = possibleslabs[nextSlab].x;
-          runners[i].y = possibleslabs[nextSlab].y;
-          runners[i].lastvisited = possibleslabs[nextSlab];
-        }else{
-          runners[i].lastvisited.id = -1;
-        }
-        if(possibleslabs[nextSlab].type == 2){
-          runners[i].state = 2;
-        }
+
       }
     }
     CurrentRunnerTime = 0.0f;
