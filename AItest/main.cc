@@ -8,11 +8,11 @@
 #include "Libs/imgui/backends/imgui_impl_sdl2.h"
 #include "Libs/imgui/backends/imgui_impl_sdlrenderer2.h"
 
-const float scale = 2.0f;
+const float scale = 1.5f;
 const int kWindowHeight = 500 * scale, kWindowWidth = 500 * scale;
 const int kMapHeight = 50, kMapWidth = 50;
 const int texsize = 10;
-const int kRunnerQuantity = 1000;
+const int kRunnerQuantity = 8;
 
 SDL_Texture* roomtex = nullptr;
 SDL_Texture* walltex = nullptr;
@@ -40,7 +40,6 @@ slab slabs[kMapHeight][kMapWidth];
 
 struct runners{
   int x, y;
-  slab lastvisited;
   int r, g, b;
   int behaviour = 0;
   int state = 1;
@@ -50,9 +49,8 @@ struct runners{
 runners runners[kRunnerQuantity];
 
 int SpawnCellQuantity = 0;
-float WorldTimer = 3000.0f, RunnerTimer = 100.0f; 
+float WorldTimer = 3000.0f, RunnerTimer = 250.0f; 
 float CurrentWorldTime = 0.0f, CurrentRunnerTime = 0.0f;
-
 
 void InitRunners(){
   slab spawnSlabs[kMapHeight * kMapWidth];
@@ -67,7 +65,7 @@ void InitRunners(){
   }
   for(int i = 0; i < kRunnerQuantity; i++){
     runners[i].behaviour = 1;
-    runners[i].direction = 0;
+    runners[i].direction = 2;
     runners[i].state = 1;
     int spawnPos = rand() % SpawnCellQuantity;
     runners[i].x = spawnSlabs[spawnPos].x;
@@ -134,7 +132,7 @@ void InitTextures() {
   roomtex = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_FreeSurface(surface);
 
-  surface = IMG_Load("Resources/Mario.png");
+  surface = IMG_Load("Resources/Marioblack.png");
   if (!surface) {
     printf("\nError loading npc texture");
   }
@@ -206,8 +204,7 @@ void InitSDL2(){
   InitTextures();
 }
 
-void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, int r = 255, int g = 255, int b = 255, bool flipX = false, bool flipY = false)
-{
+void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, int r = 255, int g = 255, int b = 255, bool flipX = false, bool flipY = false){
   if (!texture) return;
 
   SDL_SetTextureColorMod(texture, r, g, b);
@@ -229,6 +226,16 @@ void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, int r 
 
   SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, 0.0, nullptr, flip);
   SDL_SetTextureColorMod(texture, 255, 255, 255);
+}
+
+int GetStateMarios(int state){
+  int count = 0;
+  for(int i = 0; i < kRunnerQuantity; i++){
+    if(runners[i].state == state){
+      count++;
+    }
+  }
+  return count;
 }
 
 void DrawMaze(){
@@ -269,11 +276,11 @@ void DrawRunners(){
 
       case 1:
         switch(runners[i].direction){
-          case 0:
-          DrawCell(renderer, npctex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, 255, 255, 255, true);
+          case 2:
+          DrawCell(renderer, npctex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, runners[i].r, runners[i].g, runners[i].b, true);
           break;
-          case 1:
-          DrawCell(renderer, npctex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, 255, 255, 255, false);
+          case 3:
+          DrawCell(renderer, npctex, runners[i].x * texsize * scale, runners[i].y * texsize * scale, runners[i].r, runners[i].g, runners[i].b, false);
           break;
         }
       
@@ -303,22 +310,24 @@ void UpdateRunners(){
           int choices = 0;
           slab possibleslabs[4];
           int dir[4];
-          if(top.type != 0 && top.transitable && top.id != runners[i].lastvisited.id){
+          if(top.type != 0 && top.transitable){
             possibleslabs[choices] = top;
-            choices++;
-          }
-          if(bottom.type != 0 && bottom.transitable && bottom.id != runners[i].lastvisited.id){
-            possibleslabs[choices] = bottom;
-            choices++;
-          }
-          if(left.type != 0 && left.transitable && left.id != runners[i].lastvisited.id){
-            possibleslabs[choices] = left;
             dir[choices] = 0;
             choices++;
           }
-          if(right.type != 0 && right.transitable && right.id != runners[i].lastvisited.id){
-            possibleslabs[choices] = right;
+          if(bottom.type != 0 && bottom.transitable){
+            possibleslabs[choices] = bottom;
             dir[choices] = 1;
+            choices++;
+          }
+          if(left.type != 0 && left.transitable){
+            possibleslabs[choices] = left;
+            dir[choices] = 2;
+            choices++;
+          }
+          if(right.type != 0 && right.transitable){
+            possibleslabs[choices] = right;
+            dir[choices] = 3;
             choices++;
           }
           int nextSlab = 0;
@@ -326,13 +335,12 @@ void UpdateRunners(){
             nextSlab = rand() % choices;
             runners[i].x = possibleslabs[nextSlab].x;
             runners[i].y = possibleslabs[nextSlab].y;
-            runners[i].direction = dir[nextSlab];
-            runners[i].lastvisited.id = possibleslabs[nextSlab].id;
-          }else{
-            runners[i].lastvisited.id = -1;
-          }
-          if(possibleslabs[nextSlab].type == 2){
-            runners[i].state = 2;
+            if(dir[nextSlab] > 1){
+              runners[i].direction = dir[nextSlab];
+            }
+            if(possibleslabs[nextSlab].type == 2){
+              runners[i].state = 2;
+            }
           }
 
           break;
@@ -362,38 +370,41 @@ void UpdateWorld(){
   }
 }
 
-  void InitImGUI() {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::StyleColorsDark();
+void InitImGUI() {
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGui::StyleColorsDark();
 
-    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-    ImGui_ImplSDLRenderer2_Init(renderer);
-  }
+  ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+  ImGui_ImplSDLRenderer2_Init(renderer);
+}
 
-  void ImGUI() {
-    ImGui_ImplSDL2_NewFrame();
-    ImGui_ImplSDLRenderer2_NewFrame();
-    ImGui::NewFrame();
+void ImGUI() {
+  ImGui_ImplSDL2_NewFrame();
+  ImGui_ImplSDLRenderer2_NewFrame();
+  ImGui::NewFrame();
 
-    float worldSeconds = WorldTimer / 1000.0f;
-    float runnerSeconds = RunnerTimer / 1000.0f;
+  float worldSeconds = WorldTimer / 1000.0f;
+  float runnerSeconds = RunnerTimer / 1000.0f;
 
-    ImGui::Begin("Control panel");
-    ImGui::PushItemWidth(50);
-    ImGui::InputFloat("Seconds to update world", &worldSeconds, 0.0f, 10.0f, "%.2f");
-    ImGui::Text("Current World Step: %.2f", CurrentWorldTime / 1000);
-    ImGui::InputFloat("Seconds to update AI", &runnerSeconds, 0.0f, 10.0f, "%.2f");
-    ImGui::Text("Current AI Step: %.2f", CurrentRunnerTime / 1000);
-    ImGui::End();
+  ImGui::Begin("Control panel");
+  ImGui::PushItemWidth(50);
+  ImGui::InputFloat("Seconds to update world", &worldSeconds, 0.0f, 10.0f, "%.2f");
+  ImGui::Text("Current World Step: %.2f", CurrentWorldTime / 1000);
+  ImGui::InputFloat("Seconds to update AI", &runnerSeconds, 0.0f, 10.0f, "%.2f");
+  ImGui::Text("Current AI Step: %.2f", CurrentRunnerTime / 1000);
+  ImGui::Text("Current Marios: %d", GetStateMarios(1));
+  ImGui::Text("Dead Marios: %d", GetStateMarios(0));
+  ImGui::Text("Safe Marios: %d", GetStateMarios(2));
+  ImGui::End();
 
-    WorldTimer = worldSeconds * 1000.0f;
-    RunnerTimer = runnerSeconds * 1000.0f; 
+  WorldTimer = worldSeconds * 1000.0f;
+  RunnerTimer = runnerSeconds * 1000.0f; 
 
-    ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
-  }
+  ImGui::Render();
+  ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+}
 
 int main(int argc, char* argv[]) {
   srand (time(NULL));
