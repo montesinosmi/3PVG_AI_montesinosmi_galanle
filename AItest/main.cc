@@ -10,7 +10,9 @@
 
 const float scale = 1.5f;
 const int kWindowHeight = 500 * scale, kWindowWidth = 500 * scale;
+const int kMapHeight = 50, kMapWidth = 50;
 const int texsize = 10;
+const int kRunnerQuantity = 10;
 
 SDL_Texture* roomtex = nullptr;
 SDL_Texture* walltex = nullptr;
@@ -20,6 +22,7 @@ SDL_Texture* deadtex = nullptr;
 SDL_Texture* transitabletex = nullptr;
 SDL_Texture* untransitabletex = nullptr;
 SDL_Texture* victorytex = nullptr;
+SDL_Texture* spawntex = nullptr;
 
 SDL_Renderer* renderer = nullptr;
 SDL_Window* window = nullptr;
@@ -33,7 +36,7 @@ struct slab{
   int type = 0;
   bool transitable = true;
 };
-slab slabs[50][50];
+slab slabs[kMapHeight][kMapWidth];
 
 struct runners{
   int x, y;
@@ -41,18 +44,30 @@ struct runners{
   int r, g, b;
   int state = 1;
 };
-const int kRunnerQuantity = 10;
+
 runners runners[kRunnerQuantity];
 
-float WorldTimer = 3000.0f, RunnerTimer = 500.0f; 
+int SpawnCellQuantity = 0;
+float WorldTimer = 3000.0f, RunnerTimer = 100.0f; 
 float CurrentWorldTime = 0.0f, CurrentRunnerTime = 0.0f;
 
 
 void InitRunners(){
+  slab spawnSlabs[kMapHeight * kMapWidth];
+  SpawnCellQuantity = 0;
+  for (int i = 0; i < kMapHeight; i++){
+    for (int j = 0; j < kMapWidth; j++){
+      if(slabs[i][j].type == 5){
+        spawnSlabs[SpawnCellQuantity] = slabs[i][j];
+        SpawnCellQuantity++;
+      }
+    }
+  }
   for(int i = 0; i < kRunnerQuantity; i++){
     runners[i].state = 1;
-    runners[i].x = 17 + rand() % 15;
-    runners[i].y = 32 + rand() % 7;
+    int spawnPos = rand() % SpawnCellQuantity;
+    runners[i].x = spawnSlabs[spawnPos].x;
+    runners[i].y = spawnSlabs[spawnPos].y;
     runners[i].r = rand() % 256;
     runners[i].g = rand() % 256;
     runners[i].b = rand() % 256;
@@ -65,13 +80,13 @@ void InitSlabs(){
     printf("\nMap file error");
   }
   int id = 0;
-  for (int i = 0; i < 50; i++) {
-    for (int j = 0; j < 50; ) {
+  for (int i = 0; i < kMapHeight; i++) {
+    for (int j = 0; j < kMapWidth; ) {
       int c = fgetc(map_file);
       if (c == EOF){
         break;
       }
-      if(c == '0' || c == '1'|| c == '2' || c == '3' || c == '4'){
+      if(c == '0' || c == '1'|| c == '2' || c == '3' || c == '4' || c == '5'){
         slabs[i][j].x = j;
         slabs[i][j].y = i;
         slabs[i][j].id = id;
@@ -90,6 +105,8 @@ void InitSlabs(){
         }else if(c == '4'){
           slabs[i][j].type = 3;
           slabs[i][j].transitable = false;
+        }else if(c == '5'){
+          slabs[i][j].type = 5;
         }
         id++;
         j++;
@@ -161,6 +178,13 @@ void InitTextures() {
   }
   victorytex = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_FreeSurface(surface);
+
+  surface = IMG_Load("Resources/Spawn.png");
+  if (!surface) {
+    printf("\nError loading spawn texture");
+  }
+  spawntex = SDL_CreateTextureFromSurface(renderer, surface);
+  SDL_FreeSurface(surface);
 }
 
 void InitSDL2(){
@@ -195,9 +219,9 @@ void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, int x, int y, int r 
 }
 
 void DrawMaze(){
-  for (int i = 0; i < 50; i++)
+  for (int i = 0; i < kMapHeight; i++)
   {
-    for (int j = 0; j < 50; j++){
+    for (int j = 0; j < kMapWidth; j++){
       switch(slabs[i][j].type){
         case 0:
         DrawCell(renderer, walltex, j * texsize * scale, i * texsize * scale, slabs[i][j].r, slabs[i][j].g, slabs[i][j].b);
@@ -213,6 +237,9 @@ void DrawMaze(){
         if(slabs[i][j].transitable){
           DrawCell(renderer, transitabletex, j * texsize * scale, i * texsize * scale);
         }
+        break;
+        case 5:
+        DrawCell(renderer, spawntex, j * texsize * scale, i * texsize * scale);
         break;
       }
     }
@@ -264,9 +291,13 @@ void UpdateRunners(){
           choices++;
         }
         int nextSlab = rand() % choices;
-        runners[i].x = possibleslabs[nextSlab].x;
-        runners[i].y = possibleslabs[nextSlab].y;
-        runners[i].lastvisited = possibleslabs[nextSlab];
+        if(choices != 0){
+          runners[i].x = possibleslabs[nextSlab].x;
+          runners[i].y = possibleslabs[nextSlab].y;
+          runners[i].lastvisited = possibleslabs[nextSlab];
+        }else{
+          runners[i].lastvisited.id = -1;
+        }
         if(possibleslabs[nextSlab].type == 2){
           runners[i].state = 2;
         }
@@ -278,8 +309,8 @@ void UpdateRunners(){
 
 void UpdateWorld(){
   if(CurrentWorldTime >= WorldTimer){
-    for (int i = 0; i < 50; i++){
-      for (int j = 0; j < 50; j++){
+    for (int i = 0; i < kMapHeight; i++){
+      for (int j = 0; j < kMapWidth; j++){
         if(slabs[i][j].type == 3){
           slabs[i][j].transitable = !slabs[i][j].transitable;
           for(int k = 0; k < kRunnerQuantity; k++){
