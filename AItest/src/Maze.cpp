@@ -96,7 +96,7 @@ void UpdateWorld(float deltaTime, float& currentWorldTime, float worldTimer) {
         if (slabs[i][j].type == 3) {
           slabs[i][j].transitable = !slabs[i][j].transitable;
           
-          // Mata a los runners que estén en celdas que se vuelven intransitables
+          // Mata a los runners que esten en celdas que se vuelven intransitables
           KillRunnersAtPosition(slabs[i][j].x, slabs[i][j].y, slabs[i][j].transitable);
         }
       }

@@ -9,7 +9,7 @@
 #include "../deps/SDL2-2.32.8/include/SDL.h"
 #include "../deps/imgui/backends/imgui_impl_sdl2.h"
 
-// Variables globales del núcleo de la aplicación
+// Variables globales del nucleo de la aplicacion
 SDL_Renderer* renderer = nullptr;
 SDL_Window* window = nullptr;
 
@@ -22,7 +22,7 @@ float CurrentRunnerTime = 0.0f;
 int main(int argc, char* argv[]) {
   srand(time(NULL));
   
-  // Inicialización
+  // Inicializacion
   if (!Renderer_Create("AI", kWindowWidth, kWindowHeight, &window, &renderer)) {
     return -1;
   }
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     // Limpia pantalla
     SDL_RenderClear(renderer);
     
-    // Actualiza lógica del juego
+    // Actualiza logica del juego
     UpdateRunners(DeltaTime, CurrentRunnerTime, RunnerTimer);
     UpdateWorld(DeltaTime, CurrentWorldTime, WorldTimer);
     

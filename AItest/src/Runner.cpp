@@ -20,7 +20,7 @@ void InitRunners() {
     }
   }
   
-  // Inicializa cada runner en una posición de spawn aleatoria
+  // Inicializa cada runner en una posicion de spawn aleatoria
   for (int i = 0; i < kRunnerQuantity; i++) {
     runners[i].behaviour = 1;
     runners[i].direction = 2;

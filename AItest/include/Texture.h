@@ -12,10 +12,10 @@ extern SDL_Texture* untransitabletex;
 extern SDL_Texture* victorytex;
 extern SDL_Texture* spawntex;
 
-// Función para inicializar todas las texturas
+// Funcion para inicializar todas las texturas
 void InitTextures(SDL_Renderer* renderer);
 
-// Función auxiliar para dibujar una celda con opciones de color y flip
+// Funcion auxiliar para dibujar una celda con opciones de color y flip
 void DrawCell(SDL_Renderer* renderer, SDL_Texture* texture, 
               int x, int y, int r = 255, int g = 255, int b = 255, 
               bool flipX = false, bool flipY = false);

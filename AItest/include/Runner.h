@@ -23,8 +23,8 @@ void DrawRunners(SDL_Renderer* renderer);
 // Actualiza el comportamiento de los runners
 void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer);
 
-// Cuenta cuántos runners están en un estado específico
+// Cuenta cuantos runners estan en un estado especifico
 int GetStateMarios(int state);
 
-// Mata runners en una posición específica si la celda no es transitable
+// Mata runners en una posicion especifica si la celda no es transitable
 void KillRunnersAtPosition(int x, int y, bool transitable);
