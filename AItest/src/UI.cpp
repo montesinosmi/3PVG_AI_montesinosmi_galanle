@@ -25,20 +25,75 @@ void RenderImGUI(SDL_Renderer* renderer,
   float worldSeconds = worldTimer / 1000.0f;
   float runnerSeconds = runnerTimer / 1000.0f;
 
+  // Panel de control principal
   ImGui::Begin("Control panel");
-  ImGui::PushItemWidth(50);
+  ImGui::PushItemWidth(100);
   
+  ImGui::Text("=== WORLD SETTINGS ===");
   ImGui::InputFloat("Seconds to update world", &worldSeconds, 0.0f, 10.0f, "%.2f");
   ImGui::Text("Current World Step: %.2f", currentWorldTime / 1000);
   
+  ImGui::Spacing();
+  ImGui::Separator();
+  ImGui::Spacing();
+  
+  ImGui::Text("=== AI SETTINGS ===");
   ImGui::InputFloat("Seconds to update AI", &runnerSeconds, 0.0f, 10.0f, "%.2f");
   ImGui::Text("Current AI Step: %.2f", currentRunnerTime / 1000);
   
+  ImGui::Spacing();
   ImGui::Separator();
+  ImGui::Spacing();
   
+  ImGui::Text("=== STATISTICS ===");
   ImGui::Text("Current Marios: %d", GetStateMarios(1));
   ImGui::Text("Dead Marios: %d", GetStateMarios(0));
   ImGui::Text("Safe Marios: %d", GetStateMarios(2));
+  
+  ImGui::End();
+
+  // Panel de seleccion de Marios
+  ImGui::Begin("Mario Selector");
+  ImGui::Text("Select a Mario to change its algorithm:");
+  ImGui::Spacing();
+  
+  for (int i = 0; i < kRunnerQuantity; i++) {
+    ImGui::PushID(i);
+    
+    // Color del Mario
+    ImGui::ColorButton("Color", ImVec4(
+      runners[i].r / 255.0f, 
+      runners[i].g / 255.0f, 
+      runners[i].b / 255.0f, 
+      1.0f
+    ), 0, ImVec2(20, 20));
+    
+    ImGui::SameLine();
+    
+    // Estado del Mario
+    const char* stateText = "???";
+    if (runners[i].state == 0) stateText = "DEAD";
+    else if (runners[i].state == 1) stateText = "ALIVE";
+    else if (runners[i].state == 2) stateText = "SAFE";
+    
+    ImGui::Text("Mario %d [%s]", i + 1, stateText);
+    
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(200);
+    
+    // Selector de algoritmo
+    MovementAlgorithm currentAlgo = GetRunnerAlgorithm(i);
+    const char* algoNames[] = { "Random", "A* Pathfinding" };
+    int currentAlgoIndex = static_cast<int>(currentAlgo);
+    
+    ImGui::PushItemWidth(150);
+    if (ImGui::Combo("##algo", &currentAlgoIndex, algoNames, 2)) {
+      SetRunnerAlgorithm(i, static_cast<MovementAlgorithm>(currentAlgoIndex));
+    }
+    ImGui::PopItemWidth();
+    
+    ImGui::PopID();
+  }
   
   ImGui::End();
 
