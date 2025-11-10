@@ -1,0 +1,164 @@
+Render.cpp
+main.cpp
+imgui.cpp
+imgui_draw.cpp
+imgui_tables.cpp
+imgui_widgets.cpp
+imgui_impl_sdl2.cpp
+imgui_impl_sdlrenderer2.cpp
+Generando c¢digo...
+Render.obj : error LNK2019: s¡mbolo externo __imp___acrt_iob_func sin resolver al que se hace referencia en la funci¢n printf
+main.obj : error LNK2001: s¡mbolo externo __imp___acrt_iob_func sin resolver
+imgui.obj : error LNK2001: s¡mbolo externo __imp___acrt_iob_func sin resolver
+Render.obj : error LNK2019: s¡mbolo externo __imp___stdio_common_vfprintf sin resolver al que se hace referencia en la funci¢n _vfprintf_l
+main.obj : error LNK2001: s¡mbolo externo __imp___stdio_common_vfprintf sin resolver
+imgui.obj : error LNK2001: s¡mbolo externo __imp___stdio_common_vfprintf sin resolver
+main.obj : error LNK2019: s¡mbolo externo __imp_srand sin resolver al que se hace referencia en la funci¢n SDL_main
+main.obj : error LNK2019: s¡mbolo externo __imp_rand sin resolver al que se hace referencia en la funci¢n "void __cdecl InitRunners(void)" (?InitRunners@@YAXXZ)
+main.obj : error LNK2019: s¡mbolo externo __imp_fclose sin resolver al que se hace referencia en la funci¢n "void __cdecl InitSlabs(void)" (?InitSlabs@@YAXXZ)
+imgui.obj : error LNK2001: s¡mbolo externo __imp_fclose sin resolver
+main.obj : error LNK2019: s¡mbolo externo __imp_fgetc sin resolver al que se hace referencia en la funci¢n "void __cdecl InitSlabs(void)" (?InitSlabs@@YAXXZ)
+main.obj : error LNK2019: s¡mbolo externo __imp_fopen sin resolver al que se hace referencia en la funci¢n "void __cdecl InitSlabs(void)" (?InitSlabs@@YAXXZ)
+main.obj : error LNK2019: s¡mbolo externo __imp__time64 sin resolver al que se hace referencia en la funci¢n time
+imgui.obj : error LNK2019: s¡mbolo externo strcmp sin resolver al que se hace referencia en la funci¢n "bool __cdecl ImGui::Begin(char const *,bool *,int)" (?Begin@ImGui@@YA_NPEBDPEA_NH@Z)
+imgui_widgets.obj : error LNK2001: s¡mbolo externo strcmp sin resolver
+imgui_impl_sdl2.obj : error LNK2001: s¡mbolo externo strcmp sin resolver
+imgui_impl_sdl2.obj : error LNK2001: s¡mbolo externo strlen sin resolver
+imgui.obj : error LNK2001: s¡mbolo externo strlen sin resolver
+imgui_draw.obj : error LNK2001: s¡mbolo externo strlen sin resolver
+imgui_tables.obj : error LNK2001: s¡mbolo externo strlen sin resolver
+imgui_widgets.obj : error LNK2001: s¡mbolo externo strlen sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp_strncpy sin resolver al que se hace referencia en la funci¢n "void __cdecl ImStrncpy(char *,char const *,unsigned __int64)" (?ImStrncpy@@YAXPEADPEBD_K@Z)
+imgui_impl_sdl2.obj : error LNK2001: s¡mbolo externo __imp__wassert sin resolver
+imgui_impl_sdlrenderer2.obj : error LNK2001: s¡mbolo externo __imp__wassert sin resolver
+imgui.obj : error LNK2001: s¡mbolo externo __imp__wassert sin resolver
+imgui_draw.obj : error LNK2001: s¡mbolo externo __imp__wassert sin resolver
+imgui_tables.obj : error LNK2001: s¡mbolo externo __imp__wassert sin resolver
+imgui_widgets.obj : error LNK2001: s¡mbolo externo __imp__wassert sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp__wfopen sin resolver al que se hace referencia en la funci¢n "struct _iobuf * __cdecl ImFileOpen(char const *,char const *)" (?ImFileOpen@@YAPEAU_iobuf@@PEBD0@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_fflush sin resolver al que se hace referencia en la funci¢n "void __cdecl ImGui::LogFinish(void)" (?LogFinish@ImGui@@YAXXZ)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_fread sin resolver al que se hace referencia en la funci¢n "unsigned __int64 __cdecl ImFileRead(void *,unsigned __int64,unsigned __int64,struct _iobuf *)" (?ImFileRead@@YA_KPEAX_K1PEAU_iobuf@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_fseek sin resolver al que se hace referencia en la funci¢n "unsigned __int64 __cdecl ImFileGetSize(struct _iobuf *)" (?ImFileGetSize@@YA_KPEAU_iobuf@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_ftell sin resolver al que se hace referencia en la funci¢n "unsigned __int64 __cdecl ImFileGetSize(struct _iobuf *)" (?ImFileGetSize@@YA_KPEAU_iobuf@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_fwrite sin resolver al que se hace referencia en la funci¢n "unsigned __int64 __cdecl ImFileWrite(void const *,unsigned __int64,unsigned __int64,struct _iobuf *)" (?ImFileWrite@@YA_KPEBX_K1PEAU_iobuf@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp___stdio_common_vsprintf sin resolver al que se hace referencia en la funci¢n _vsnprintf_l
+imgui_impl_sdl2.obj : error LNK2001: s¡mbolo externo __imp___stdio_common_vsprintf sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp___stdio_common_vsscanf sin resolver al que se hace referencia en la funci¢n _vsscanf_l
+imgui_tables.obj : error LNK2001: s¡mbolo externo __imp___stdio_common_vsscanf sin resolver
+imgui_widgets.obj : error LNK2001: s¡mbolo externo __imp___stdio_common_vsscanf sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp_free sin resolver al que se hace referencia en la funci¢n "void __cdecl ImGui::UpdateViewportsNewFrame(void)" (?UpdateViewportsNewFrame@ImGui@@YAXXZ)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_malloc sin resolver al que se hace referencia en la funci¢n "void __cdecl ImGui::UpdateViewportsNewFrame(void)" (?UpdateViewportsNewFrame@ImGui@@YAXXZ)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_qsort sin resolver al que se hace referencia en la funci¢n "void __cdecl ImQsort(void *,unsigned __int64,unsigned __int64,int (__cdecl*)(void const *,void const *))" (?ImQsort@@YAXPEAX_K1P6AHPEBX2@Z@Z)
+imgui_draw.obj : error LNK2001: s¡mbolo externo __imp_qsort sin resolver
+imgui_widgets.obj : error LNK2001: s¡mbolo externo __imp_qsort sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo fabs sin resolver al que se hace referencia en la funci¢n fabsf
+imgui_draw.obj : error LNK2001: s¡mbolo externo fabs sin resolver
+imgui_tables.obj : error LNK2001: s¡mbolo externo fabs sin resolver
+imgui_widgets.obj : error LNK2001: s¡mbolo externo fabs sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp_ceilf sin resolver al que se hace referencia en la funci¢n "void __cdecl ImGui::CalcClipRectVisibleItemsY(struct ImRect const &,struct ImVec2 const &,float,int *,int *)" (?CalcClipRectVisibleItemsY@ImGui@@YAXAEBUImRect@@AEBUImVec2@@MPEAH2@Z)
+imgui_draw.obj : error LNK2001: s¡mbolo externo __imp_ceilf sin resolver
+imgui_tables.obj : error LNK2001: s¡mbolo externo __imp_ceilf sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp_cosf sin resolver al que se hace referencia en la funci¢n "void __cdecl ImGui::UpdateDebugToolFlashStyleColor(void)" (?UpdateDebugToolFlashStyleColor@ImGui@@YAXXZ)
+imgui_draw.obj : error LNK2001: s¡mbolo externo __imp_cosf sin resolver
+imgui_tables.obj : error LNK2001: s¡mbolo externo __imp_cosf sin resolver
+imgui_widgets.obj : error LNK2001: s¡mbolo externo __imp_cosf sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp_fmodf sin resolver al que se hace referencia en la funci¢n "void __cdecl ImGui::ShowIDStackToolWindow(bool *)" (?ShowIDStackToolWindow@ImGui@@YAXPEA_N@Z)
+imgui_widgets.obj : error LNK2001: s¡mbolo externo __imp_fmodf sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp_sqrtf sin resolver al que se hace referencia en la funci¢n "void __cdecl ImGui::ShowFontAtlas(struct ImFontAtlas *)" (?ShowFontAtlas@ImGui@@YAXPEAUImFontAtlas@@@Z)
+imgui_draw.obj : error LNK2001: s¡mbolo externo __imp_sqrtf sin resolver
+imgui.obj : error LNK2019: s¡mbolo externo __imp_GlobalAlloc sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetClipboardTextFn_DefaultImpl(struct ImGuiContext *,char const *)" (?Platform_SetClipboardTextFn_DefaultImpl@@YAXPEAUImGuiContext@@PEBD@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_GlobalUnlock sin resolver al que se hace referencia en la funci¢n "char const * __cdecl Platform_GetClipboardTextFn_DefaultImpl(struct ImGuiContext *)" (?Platform_GetClipboardTextFn_DefaultImpl@@YAPEBDPEAUImGuiContext@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_GlobalLock sin resolver al que se hace referencia en la funci¢n "char const * __cdecl Platform_GetClipboardTextFn_DefaultImpl(struct ImGuiContext *)" (?Platform_GetClipboardTextFn_DefaultImpl@@YAPEBDPEAUImGuiContext@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_GlobalFree sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetClipboardTextFn_DefaultImpl(struct ImGuiContext *,char const *)" (?Platform_SetClipboardTextFn_DefaultImpl@@YAXPEAUImGuiContext@@PEBD@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_OpenClipboard sin resolver al que se hace referencia en la funci¢n "char const * __cdecl Platform_GetClipboardTextFn_DefaultImpl(struct ImGuiContext *)" (?Platform_GetClipboardTextFn_DefaultImpl@@YAPEBDPEAUImGuiContext@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_CloseClipboard sin resolver al que se hace referencia en la funci¢n "char const * __cdecl Platform_GetClipboardTextFn_DefaultImpl(struct ImGuiContext *)" (?Platform_GetClipboardTextFn_DefaultImpl@@YAPEBDPEAUImGuiContext@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_SetClipboardData sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetClipboardTextFn_DefaultImpl(struct ImGuiContext *,char const *)" (?Platform_SetClipboardTextFn_DefaultImpl@@YAXPEAUImGuiContext@@PEBD@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_GetClipboardData sin resolver al que se hace referencia en la funci¢n "char const * __cdecl Platform_GetClipboardTextFn_DefaultImpl(struct ImGuiContext *)" (?Platform_GetClipboardTextFn_DefaultImpl@@YAPEBDPEAUImGuiContext@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_EmptyClipboard sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetClipboardTextFn_DefaultImpl(struct ImGuiContext *,char const *)" (?Platform_SetClipboardTextFn_DefaultImpl@@YAXPEAUImGuiContext@@PEBD@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_MultiByteToWideChar sin resolver al que se hace referencia en la funci¢n "struct _iobuf * __cdecl ImFileOpen(char const *,char const *)" (?ImFileOpen@@YAPEAU_iobuf@@PEBD0@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_WideCharToMultiByte sin resolver al que se hace referencia en la funci¢n "char const * __cdecl Platform_GetClipboardTextFn_DefaultImpl(struct ImGuiContext *)" (?Platform_GetClipboardTextFn_DefaultImpl@@YAPEBDPEAUImGuiContext@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo ImmGetContext sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetImeDataFn_DefaultImpl(struct ImGuiContext *,struct ImGuiViewport *,struct ImGuiPlatformImeData *)" (?Platform_SetImeDataFn_DefaultImpl@@YAXPEAUImGuiContext@@PEAUImGuiViewport@@PEAUImGuiPlatformImeData@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo ImmReleaseContext sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetImeDataFn_DefaultImpl(struct ImGuiContext *,struct ImGuiViewport *,struct ImGuiPlatformImeData *)" (?Platform_SetImeDataFn_DefaultImpl@@YAXPEAUImGuiContext@@PEAUImGuiViewport@@PEAUImGuiPlatformImeData@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo ImmSetCompositionWindow sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetImeDataFn_DefaultImpl(struct ImGuiContext *,struct ImGuiViewport *,struct ImGuiPlatformImeData *)" (?Platform_SetImeDataFn_DefaultImpl@@YAXPEAUImGuiContext@@PEAUImGuiViewport@@PEAUImGuiPlatformImeData@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo ImmSetCandidateWindow sin resolver al que se hace referencia en la funci¢n "void __cdecl Platform_SetImeDataFn_DefaultImpl(struct ImGuiContext *,struct ImGuiViewport *,struct ImGuiPlatformImeData *)" (?Platform_SetImeDataFn_DefaultImpl@@YAXPEAUImGuiContext@@PEAUImGuiViewport@@PEAUImGuiPlatformImeData@@@Z)
+imgui.obj : error LNK2019: s¡mbolo externo __imp_ShellExecuteW sin resolver al que se hace referencia en la funci¢n "bool __cdecl Platform_OpenInShellFn_DefaultImpl(struct ImGuiContext *,char const *)" (?Platform_OpenInShellFn_DefaultImpl@@YA_NPEAUImGuiContext@@PEBD@Z)
+imgui_draw.obj : error LNK2019: s¡mbolo externo __imp_acosf sin resolver al que se hace referencia en la funci¢n "public: int __cdecl ImDrawList::_CalcCircleAutoSegmentCount(float)const " (?_CalcCircleAutoSegmentCount@ImDrawList@@QEBAHM@Z)
+imgui_draw.obj : error LNK2019: s¡mbolo externo __imp_sinf sin resolver al que se hace referencia en la funci¢n "public: void __cdecl ImDrawList::PathArcTo(struct ImVec2 const &,float,float,float,int)" (?PathArcTo@ImDrawList@@QEAAXAEBUImVec2@@MMMH@Z)
+imgui_tables.obj : error LNK2001: s¡mbolo externo __imp_sinf sin resolver
+imgui_widgets.obj : error LNK2001: s¡mbolo externo __imp_sinf sin resolver
+imgui_widgets.obj : error LNK2019: s¡mbolo externo __imp_strncmp sin resolver al que se hace referencia en la funci¢n "bool __cdecl ImGui::InputTextEx(char const *,char const *,char *,int,struct ImVec2 const &,int,int (__cdecl*)(struct ImGuiInputTextCallbackData *),void *)" (?InputTextEx@ImGui@@YA_NPEBD0PEADHAEBUImVec2@@HP6AHPEAUImGuiInputTextCallbackData@@@ZPEAX@Z)
+imgui_impl_sdl2.obj : error LNK2001: s¡mbolo externo __imp_strncmp sin resolver
+imgui_widgets.obj : error LNK2019: s¡mbolo externo __imp_atof sin resolver al que se hace referencia en la funci¢n "int __cdecl ImGui::RoundScalarWithFormatT<int>(char const *,int,int)" (??$RoundScalarWithFormatT@H@ImGui@@YAHPEBDHH@Z)
+imgui_widgets.obj : error LNK2019: s¡mbolo externo log sin resolver al que se hace referencia en la funci¢n "double __cdecl ImLog(double)" (?ImLog@@YANN@Z)
+imgui_widgets.obj : error LNK2019: s¡mbolo externo pow sin resolver al que se hace referencia en la funci¢n "double __cdecl ImPow(double,double)" (?ImPow@@YANNN@Z)
+imgui_widgets.obj : error LNK2019: s¡mbolo externo __imp_atan2f sin resolver al que se hace referencia en la funci¢n "bool __cdecl ImGui::ColorPicker4(char const *,float * const,int,float const *)" (?ColorPicker4@ImGui@@YA_NPEBDQEAMHPEBM@Z)
+imgui_widgets.obj : error LNK2019: s¡mbolo externo __imp_logf sin resolver al que se hace referencia en la funci¢n "float __cdecl ImLog(float)" (?ImLog@@YAMM@Z)
+imgui_widgets.obj : error LNK2019: s¡mbolo externo __imp_powf sin resolver al que se hace referencia en la funci¢n "float __cdecl ImPow(float,float)" (?ImPow@@YAMMM@Z)
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_RtlCaptureContext sin resolver al que se hace referencia en la funci¢n capture_current_context
+MSVCRTD.lib(utility_desktop.obj) : error LNK2001: s¡mbolo externo __imp_RtlCaptureContext sin resolver
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_RtlLookupFunctionEntry sin resolver al que se hace referencia en la funci¢n capture_current_context
+MSVCRTD.lib(utility_desktop.obj) : error LNK2001: s¡mbolo externo __imp_RtlLookupFunctionEntry sin resolver
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_RtlVirtualUnwind sin resolver al que se hace referencia en la funci¢n capture_current_context
+MSVCRTD.lib(utility_desktop.obj) : error LNK2001: s¡mbolo externo __imp_RtlVirtualUnwind sin resolver
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_UnhandledExceptionFilter sin resolver al que se hace referencia en la funci¢n __raise_securityfailure
+MSVCRTD.lib(utility_desktop.obj) : error LNK2001: s¡mbolo externo __imp_UnhandledExceptionFilter sin resolver
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_SetUnhandledExceptionFilter sin resolver al que se hace referencia en la funci¢n __raise_securityfailure
+MSVCRTD.lib(utility_desktop.obj) : error LNK2001: s¡mbolo externo __imp_SetUnhandledExceptionFilter sin resolver
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_GetCurrentProcess sin resolver al que se hace referencia en la funci¢n __raise_securityfailure
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_TerminateProcess sin resolver al que se hace referencia en la funci¢n __raise_securityfailure
+MSVCRTD.lib(gs_report.obj) : error LNK2019: s¡mbolo externo __imp_IsProcessorFeaturePresent sin resolver al que se hace referencia en la funci¢n __report_gsfailure
+MSVCRTD.lib(utility_desktop.obj) : error LNK2001: s¡mbolo externo __imp_IsProcessorFeaturePresent sin resolver
+MSVCRTD.lib(thread_safe_statics.obj) : error LNK2019: s¡mbolo externo __imp_ReleaseSRWLockExclusive sin resolver al que se hace referencia en la funci¢n _Init_thread_unlock
+MSVCRTD.lib(thread_safe_statics.obj) : error LNK2019: s¡mbolo externo __imp_AcquireSRWLockExclusive sin resolver al que se hace referencia en la funci¢n _Init_thread_lock
+MSVCRTD.lib(thread_safe_statics.obj) : error LNK2019: s¡mbolo externo __imp_WakeAllConditionVariable sin resolver al que se hace referencia en la funci¢n _Init_thread_notify
+MSVCRTD.lib(thread_safe_statics.obj) : error LNK2019: s¡mbolo externo __imp_SleepConditionVariableSRW sin resolver al que se hace referencia en la funci¢n _Init_thread_wait_v2
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _seh_filter_exe sin resolver al que se hace referencia en la funci¢n "int `int __cdecl __scrt_common_main_seh(void)'::`1'::filt$0" (?filt$0@?0??__scrt_common_main_seh@@YAHXZ@4HA)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _set_app_type sin resolver al que se hace referencia en la funci¢n "public: static void __cdecl __scrt_main_policy::set_app_type(void)" (?set_app_type@__scrt_main_policy@@SAXXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo __setusermatherr sin resolver al que se hace referencia en la funci¢n "int __cdecl pre_c_initialization(void)" (?pre_c_initialization@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _configure_narrow_argv sin resolver al que se hace referencia en la funci¢n "public: static int __cdecl __scrt_narrow_argv_policy::configure_argv(void)" (?configure_argv@__scrt_narrow_argv_policy@@SAHXZ)
+MSVCRTD.lib(utility.obj) : error LNK2001: s¡mbolo externo _configure_narrow_argv sin resolver
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _initialize_narrow_environment sin resolver al que se hace referencia en la funci¢n "public: static int __cdecl __scrt_narrow_environment_policy::initialize_environment(void)" (?initialize_environment@__scrt_narrow_environment_policy@@SAHXZ)
+MSVCRTD.lib(utility.obj) : error LNK2001: s¡mbolo externo _initialize_narrow_environment sin resolver
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _get_initial_narrow_environment sin resolver al que se hace referencia en la funci¢n "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _initterm sin resolver al que se hace referencia en la funci¢n "int __cdecl __scrt_common_main_seh(void)" (?__scrt_common_main_seh@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _initterm_e sin resolver al que se hace referencia en la funci¢n "int __cdecl __scrt_common_main_seh(void)" (?__scrt_common_main_seh@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo exit sin resolver al que se hace referencia en la funci¢n "int __cdecl __scrt_common_main_seh(void)" (?__scrt_common_main_seh@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _exit sin resolver al que se hace referencia en la funci¢n "int __cdecl __scrt_common_main_seh(void)" (?__scrt_common_main_seh@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _set_fmode sin resolver al que se hace referencia en la funci¢n "public: static void __cdecl __scrt_file_policy::set_fmode(void)" (?set_fmode@__scrt_file_policy@@SAXXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo __p___argc sin resolver al que se hace referencia en la funci¢n "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo __p___argv sin resolver al que se hace referencia en la funci¢n "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _cexit sin resolver al que se hace referencia en la funci¢n "int __cdecl __scrt_common_main_seh(void)" (?__scrt_common_main_seh@@YAHXZ)
+MSVCRTD.lib(utility.obj) : error LNK2001: s¡mbolo externo _cexit sin resolver
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _c_exit sin resolver al que se hace referencia en la funci¢n "int __cdecl __scrt_common_main_seh(void)" (?__scrt_common_main_seh@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _register_thread_local_exe_atexit_callback sin resolver al que se hace referencia en la funci¢n "int __cdecl __scrt_common_main_seh(void)" (?__scrt_common_main_seh@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _configthreadlocale sin resolver al que se hace referencia en la funci¢n "int __cdecl pre_c_initialization(void)" (?pre_c_initialization@@YAHXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo _set_new_mode sin resolver al que se hace referencia en la funci¢n "void __cdecl pre_cpp_initialization(void)" (?pre_cpp_initialization@@YAXXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: s¡mbolo externo __p__commode sin resolver al que se hace referencia en la funci¢n "public: static void __cdecl __scrt_file_policy::set_commode(void)" (?set_commode@__scrt_file_policy@@SAXXZ)
+MSVCRTD.lib(delete_scalar.obj) : error LNK2019: s¡mbolo externo _free_dbg sin resolver al que se hace referencia en la funci¢n "void __cdecl operator delete(void *)" (??3@YAXPEAX@Z)
+MSVCRTD.lib(utility.obj) : error LNK2019: s¡mbolo externo _seh_filter_dll sin resolver al que se hace referencia en la funci¢n __scrt_dllmain_exception_filter
+MSVCRTD.lib(utility.obj) : error LNK2019: s¡mbolo externo _initialize_onexit_table sin resolver al que se hace referencia en la funci¢n __scrt_initialize_onexit_tables
+MSVCRTD.lib(utility.obj) : error LNK2019: s¡mbolo externo _register_onexit_function sin resolver al que se hace referencia en la funci¢n _onexit
+MSVCRTD.lib(utility.obj) : error LNK2019: s¡mbolo externo _execute_onexit_table sin resolver al que se hace referencia en la funci¢n __scrt_dllmain_uninitialize_c
+MSVCRTD.lib(utility.obj) : error LNK2019: s¡mbolo externo _crt_atexit sin resolver al que se hace referencia en la funci¢n _onexit
+MSVCRTD.lib(utility.obj) : error LNK2019: s¡mbolo externo _crt_at_quick_exit sin resolver al que se hace referencia en la funci¢n at_quick_exit
+MSVCRTD.lib(gs_support.obj) : error LNK2019: s¡mbolo externo __imp_QueryPerformanceCounter sin resolver al que se hace referencia en la funci¢n __get_entropy
+MSVCRTD.lib(gs_support.obj) : error LNK2019: s¡mbolo externo __imp_GetCurrentProcessId sin resolver al que se hace referencia en la funci¢n __get_entropy
+MSVCRTD.lib(gs_support.obj) : error LNK2019: s¡mbolo externo __imp_GetCurrentThreadId sin resolver al que se hace referencia en la funci¢n __get_entropy
+MSVCRTD.lib(gs_support.obj) : error LNK2019: s¡mbolo externo __imp_GetSystemTimeAsFileTime sin resolver al que se hace referencia en la funci¢n __get_entropy
+MSVCRTD.lib(tncleanup.obj) : error LNK2019: s¡mbolo externo __imp_InitializeSListHead sin resolver al que se hace referencia en la funci¢n "void __cdecl __scrt_initialize_type_info(void)" (?__scrt_initialize_type_info@@YAXXZ)
+MSVCRTD.lib(utility_desktop.obj) : error LNK2019: s¡mbolo externo __imp_IsDebuggerPresent sin resolver al que se hace referencia en la funci¢n __scrt_fastfail
+MSVCRTD.lib(utility_desktop.obj) : error LNK2019: s¡mbolo externo __imp_GetStartupInfoW sin resolver al que se hace referencia en la funci¢n __scrt_get_show_window_mode
+MSVCRTD.lib(utility_desktop.obj) : error LNK2019: s¡mbolo externo __imp_GetModuleHandleW sin resolver al que se hace referencia en la funci¢n __scrt_is_managed_app
+MSVCRTD.lib(utility_desktop.obj) : error LNK2019: s¡mbolo externo terminate sin resolver al que se hace referencia en la funci¢n __scrt_unhandled_exception_filter
+SDL2main.lib(SDL_windows_main.obj) : error LNK2019: s¡mbolo externo __imp_GetCommandLineW sin resolver al que se hace referencia en la funci¢n main_getcmdline
+SDL2main.lib(SDL_windows_main.obj) : error LNK2019: s¡mbolo externo __imp_HeapAlloc sin resolver al que se hace referencia en la funci¢n main_getcmdline
+SDL2main.lib(SDL_windows_main.obj) : error LNK2019: s¡mbolo externo __imp_HeapFree sin resolver al que se hace referencia en la funci¢n main_getcmdline
+SDL2main.lib(SDL_windows_main.obj) : error LNK2019: s¡mbolo externo __imp_GetProcessHeap sin resolver al que se hace referencia en la funci¢n main_getcmdline
+SDL2main.lib(SDL_windows_main.obj) : error LNK2019: s¡mbolo externo __imp_LocalFree sin resolver al que se hace referencia en la funci¢n main_getcmdline
+SDL2main.lib(SDL_windows_main.obj) : error LNK2019: s¡mbolo externo __imp_CommandLineToArgvW sin resolver al que se hace referencia en la funci¢n main_getcmdline
+C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86\shell32.lib : warning LNK4272: el tipo de m quina de biblioteca 'x86' est  en conflicto con el tipo de m quina de destino 'x64'
+C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86\user32.lib : warning LNK4272: el tipo de m quina de biblioteca 'x86' est  en conflicto con el tipo de m quina de destino 'x64'
+C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86\kernel32.lib : warning LNK4272: el tipo de m quina de biblioteca 'x86' est  en conflicto con el tipo de m quina de destino 'x64'
+C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86\imm32.lib : warning LNK4272: el tipo de m quina de biblioteca 'x86' est  en conflicto con el tipo de m quina de destino 'x64'
+C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\ucrt\x86\ucrtd.lib : warning LNK4272: el tipo de m quina de biblioteca 'x86' est  en conflicto con el tipo de m quina de destino 'x64'
+..\bin\AItest.exe : fatal error LNK1120: 106 externos sin resolver
