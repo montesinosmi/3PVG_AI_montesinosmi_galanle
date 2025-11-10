@@ -236,6 +236,10 @@ bool FindGoalPosition(int& goalX, int& goalY) {
   return false;
 }
 
+//////////////////////////////////
+/////////// ALGORITMOS ///////////
+//////////////////////////////////
+
 // Implementacion del algoritmo A*
 bool CalculateAStarPath(Runner& runner) {
   int goalX, goalY;
