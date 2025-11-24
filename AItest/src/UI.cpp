@@ -15,6 +15,11 @@ void InitImGUI(SDL_Window* window, SDL_Renderer* renderer) {
   ImGui_ImplSDLRenderer2_Init(renderer);
 }
 
+void PositionSizeImGUI(float pos_x, float pos_y, float size_x, float size_y) {
+    ImGui::SetNextWindowPos(ImVec2(pos_x * kScale, pos_y * kScale), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(size_x + kScale, size_y * kScale), ImGuiCond_Always);
+}
+
 void RenderImGUI(SDL_Renderer* renderer,
                  float& worldTimer, float& runnerTimer,
                  float currentWorldTime, float currentRunnerTime) {
@@ -26,6 +31,8 @@ void RenderImGUI(SDL_Renderer* renderer,
   float runnerSeconds = runnerTimer / 1000.0f;
 
   // Panel de control principal
+  PositionSizeImGUI(500, 0, 450, 200);
+
   ImGui::Begin("Control panel");
   ImGui::PushItemWidth(100);
   
@@ -53,6 +60,8 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::End();
 
   // Panel de seleccion de Marios
+  PositionSizeImGUI(500, 200, 450, 300);
+
   ImGui::Begin("Mario Selector");
   ImGui::Text("Select a Mario to change its algorithm:");
   ImGui::Spacing();

@@ -3,8 +3,8 @@
 // Constantes de ventana
 const float kScale = 1.5f;
 const int kTexSize = 10;
-const int kWindowWidth = 500 * kScale;
-const int kWindowHeight = 500 * kScale;
+const int kWindowWidth = 800 * kScale;		// 1200
+const int kWindowHeight = 500 * kScale;		// 750
 
 // Constantes del mapa
 const int kMapHeight = 50;
