@@ -1,3 +1,5 @@
+
+
 # Prerequisites
 *.d
 
@@ -11,7 +13,7 @@
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
+# Compiled Dynamic libraries (NO ignoramos .dll para poder versionarlas)
 *.so
 *.dylib
 
@@ -23,9 +25,58 @@
 *.lai
 *.la
 *.a
-#*.lib
+# *.lib   # <- comentado para subir SDL2.lib, SDL2_image.lib, etc.
 
 # Executables
 *.exe
 *.out
 *.app
+
+########################
+# Visual Studio
+########################
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+########################
+# Builds / intermedios
+########################
+# IGNORAR TODO bin/...
+bin/**
+
+# ...PERO PERMITIR ESTAS DLL ESPECÍFICAS
+!bin/
+!bin/Debug/
+!bin/Release/
+!bin/Debug/SDL2.dll
+!bin/Debug/SDL2_image.dll
+!bin/Release/SDL2.dll
+!bin/Release/SDL2_image.dll
+
+# Resto de build sigue ignorado
+build/**/Debug/
+build/**/Release/
+build/**/x64/
+build/**/ipch/
+build/**/obj/
+*.log
+*.tlog
+*.pdb
+*.ilk
+*.idb
+*.lastbuildstate
+*.recipe
+
+########################
+# ImGui (opcional)
+########################
+imgui.ini
+
+########################
+# Otros
+########################
+*.tmp
+*.cache

@@ -35,7 +35,19 @@ void InitRunners() {
       }
     }
   }
-  
+
+  //if (spawnCellQuantity == 0) {
+  //  printf("\n[InitRunners] No hay celdas de spawn (tipo 5). "
+  //    "Revisa assets/Maps/map_1.txt o las rutas.\n");
+  //  // Marcamos como muertos / inactivos
+  //  for (int i = 0; i < kRunnerQuantity; ++i) {
+  //    runners[i].x = 0;
+  //    runners[i].y = 0;
+  //    runners[i].state = 0;
+  //  }
+  //  return;
+  //}
+
   // Inicializa cada runner en una posicion de spawn aleatoria
   for (int i = 0; i < kRunnerQuantity; i++) {
     runners[i].behaviour = 1;

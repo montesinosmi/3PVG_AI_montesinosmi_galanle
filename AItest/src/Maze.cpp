@@ -8,7 +8,10 @@
 slab slabs[kMapHeight][kMapWidth];
 
 void InitSlabs() {
-  FILE* map_file = fopen("../assets/Maps/map_1.txt", "r");
+  //FILE* map_file = fopen("../assets/Maps/map_1.txt", "r");
+  FILE* map_file = nullptr;
+  fopen_s(&map_file, "../assets/Maps/map_1.txt", "r");
+
   if (map_file == nullptr) {
     printf("\nMap file error");
     return;
