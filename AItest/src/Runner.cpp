@@ -53,6 +53,9 @@ void InitRunners() {
     runners[i].behaviour = 1;
     runners[i].direction = 2;
     runners[i].state = 1;
+
+    runners[i].lifeTime = 0.0f;
+    runners[i].currentAlgoTime = 0.0f;
     
     int spawnPos = rand() % spawnCellQuantity;
     runners[i].x = spawnSlabs[spawnPos].x;
@@ -99,6 +102,15 @@ void DrawRunners(SDL_Renderer* renderer) {
 void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer) {
   currentRunnerTime += deltaTime;
   
+  // Actualizar contadores de tiempo fuera del if del timer de movimiento
+  for (int i = 0; i < kRunnerQuantity; i++) {
+    if (runners[i].state == 1) { // Solo si esta VIVO
+      float dtSeconds = deltaTime / 1000.0f;
+      runners[i].lifeTime += dtSeconds;
+      runners[i].currentAlgoTime += dtSeconds;
+    }
+  }
+
   if (currentRunnerTime >= runnerTimer) {
     for (int i = 0; i < kRunnerQuantity; i++) {
       if (runners[i].state == 1) {
@@ -216,6 +228,10 @@ void KillRunnersAtPosition(int x, int y, bool transitable) {
 
 void SetRunnerAlgorithm(int runnerIndex, MovementAlgorithm algorithm) {
   if (runnerIndex >= 0 && runnerIndex < kRunnerQuantity) {
+    // Si el algoritmo es diferente al actual, reseteamos el tiempo
+    if (runners[runnerIndex].algorithm != algorithm) {
+      runners[runnerIndex].currentAlgoTime = 0.0f;
+    }
     runners[runnerIndex].algorithm = algorithm;
     runners[runnerIndex].pathLength = 0;
     runners[runnerIndex].pathIndex = 0;

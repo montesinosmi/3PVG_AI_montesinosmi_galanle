@@ -67,7 +67,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::Spacing();
   
   for (int i = 0; i < kRunnerQuantity; i++) {
-    ImGui::PushID(i);
+    /*ImGui::PushID(i);
     
     // Color del Mario
     ImGui::ColorButton("Color", ImVec4(
@@ -101,6 +101,62 @@ void RenderImGUI(SDL_Renderer* renderer,
     }
     ImGui::PopItemWidth();
     
+    ImGui::PopID();*/
+    ImGui::PushID(i);
+
+    // EDITOR DE COLOR 
+    // ImGui usa floats (0.0 a 1.0), SDL usa ints (0 a 255). Convertimos:
+    float color[3] = {
+        runners[i].r / 255.0f,
+        runners[i].g / 255.0f,
+        runners[i].b / 255.0f
+    };
+
+    // Usamos ColorEdit3 en lugar de ColorButton para permitir cambios
+    // ImGuiColorEditFlags_NoInputs oculta los inputs numéricos para ahorrar espacio
+    if (ImGui::ColorEdit3("##Color", color, ImGuiColorEditFlags_NoInputs)) {
+      runners[i].r = static_cast<int>(color[0] * 255);
+      runners[i].g = static_cast<int>(color[1] * 255);
+      runners[i].b = static_cast<int>(color[2] * 255);
+    }
+
+    ImGui::SameLine();
+
+    // INFORMACIÓN DE ESTADO Y TIEMPOS 
+    // Organizamos la info en columnas o líneas
+    ImGui::BeginGroup(); // Agrupamos texto para que no se descuadre con el color
+
+    // Estado
+    const char* stateText = "???";
+    if (runners[i].state == 0) stateText = "DEAD";
+    else if (runners[i].state == 1) stateText = "ALIVE";
+    else if (runners[i].state == 2) stateText = "SAFE";
+    ImGui::Text("Mario %d [%s]", i + 1, stateText);
+
+    // Tiempos (Formato: 0.00s)
+    // Se pararán solos al morir porque dejamos de sumar en UpdateRunners
+    ImGui::Text("Life: %.2fs | Algo: %.2fs", runners[i].lifeTime, runners[i].currentAlgoTime);
+
+    ImGui::EndGroup();
+
+    ImGui::SameLine();
+
+    // SELECTOR DE ALGORITMO
+    // Movemos el cursor un poco a la derecha si es necesario
+    float availWidth = ImGui::GetContentRegionAvail().x;
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availWidth - 150)); // Alinear a la derecha
+
+    MovementAlgorithm currentAlgo = GetRunnerAlgorithm(i);
+    const char* algoNames[] = { "Random", "A* Pathfinding" };
+    int currentAlgoIndex = static_cast<int>(currentAlgo);
+
+    ImGui::PushItemWidth(150);
+    if (ImGui::Combo("##algo", &currentAlgoIndex, algoNames, 2)) {
+      SetRunnerAlgorithm(i, static_cast<MovementAlgorithm>(currentAlgoIndex));
+    }
+    ImGui::PopItemWidth();
+
+    ImGui::Separator(); // Una línea para separar cada Mario visualmente
     ImGui::PopID();
   }
   

@@ -13,9 +13,12 @@ struct Runner {
   int x, y;
   int r, g, b;
   int behaviour = 0;
-  int state = 1;
+  int state = 1;        // 0: Dead, 1: Alive, 2: Safe
   int direction = 0;
   MovementAlgorithm algorithm = MovementAlgorithm::RANDOM;
+
+  float lifeTime;        // Tiempo total de vida
+  float currentAlgoTime; // Tiempo con el algoritmo actual
   
   // Para A* pathfinding
   int pathLength = 0;
