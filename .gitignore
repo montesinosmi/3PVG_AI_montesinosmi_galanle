@@ -1,5 +1,3 @@
-
-
 # Prerequisites
 *.d
 
@@ -27,7 +25,7 @@
 *.a
 # *.lib   # <- comentado para subir SDL2.lib, SDL2_image.lib, etc.
 
-# Executables
+# Executables (no queremos subir .exe)
 *.exe
 *.out
 *.app
@@ -36,7 +34,7 @@
 # Visual Studio
 ########################
 .vs/
-*.user
+# *.user   <-- IMPORTANTE: comentado para que se suba el .vcxproj.user
 *.suo
 *.VC.db
 *.VC.opendb
@@ -44,10 +42,10 @@
 ########################
 # Builds / intermedios
 ########################
-# IGNORAR TODO bin/...
+# Ignorar TODO bin/
 bin/**
 
-# ...PERO PERMITIR ESTAS DLL ESPECÍFICAS
+# ...PERO permitir que se suban SOLO estas DLL específicas:
 !bin/
 !bin/Debug/
 !bin/Release/
@@ -56,7 +54,7 @@ bin/**
 !bin/Release/SDL2.dll
 !bin/Release/SDL2_image.dll
 
-# Resto de build sigue ignorado
+# Resto de build (intermedios) ignorados
 build/**/Debug/
 build/**/Release/
 build/**/x64/
