@@ -34,7 +34,7 @@
 # Visual Studio
 ########################
 .vs/
-# *.user   <-- IMPORTANTE: comentado para que se suba el .vcxproj.user
+*.user
 *.suo
 *.VC.db
 *.VC.opendb
@@ -54,12 +54,9 @@ bin/**
 !bin/Release/SDL2.dll
 !bin/Release/SDL2_image.dll
 
-# Resto de build (intermedios) ignorados
-build/**/Debug/
-build/**/Release/
-build/**/x64/
-build/**/ipch/
-build/**/obj/
+# Ignorar todo lo generado por Premake/VS
+build/**
+
 *.log
 *.tlog
 *.pdb
