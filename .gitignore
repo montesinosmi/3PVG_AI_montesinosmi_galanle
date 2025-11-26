@@ -55,6 +55,7 @@ bin/**
 !bin/Release/SDL2_image.dll
 
 # Ignorar todo lo generado por Premake/VS
+**/build/
 build/**
 
 *.log
