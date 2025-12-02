@@ -35,6 +35,9 @@ struct Runner {
   int pathIndex = 0;
   int pathX[kMapHeight * kMapWidth];
   int pathY[kMapHeight * kMapWidth];
+
+  // Control de pausa
+  bool isPaused = false;  // true = detenido, false = en movimiento
 };
 
 // Array global de runners (definido en Runner.cpp)
@@ -69,3 +72,9 @@ void SetRunnerGoal(int runnerIndex, int goalX, int goalY);
 
 // Resetea el objetivo a la meta por defecto
 void ResetRunnerGoal(int runnerIndex);
+
+// Pausa/reanuda un runner especifico
+void SetRunnerPaused(int runnerIndex, bool paused);
+
+// Verifica si un runner esta pausado
+bool IsRunnerPaused(int runnerIndex);

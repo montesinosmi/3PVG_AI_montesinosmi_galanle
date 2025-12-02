@@ -176,7 +176,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   // Boton de reset del mapa
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
-  if (ImGui::Button("RESET MAP", ImVec2(335, 45))) {
+  if (ImGui::Button("RESET MAP", ImVec2(380, 45))) {
     ResetMap();
     currentBrush = BrushMode::NONE;  // Deselecciona brush al resetear
   }
@@ -212,9 +212,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::Separator();
   ImGui::Spacing();
 
-  ImGui::TextWrapped("Programmers: Alvaro G. & Pablo M.");
-  ImGui::Spacing();
-  ImGui::TextWrapped("Professor: Gustavo Aranda");
+  ImGui::TextWrapped("Tip: Use Lava to create dynamic obstacles!");
 
   ImGui::End();
 
@@ -315,12 +313,12 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     ImGui::SameLine();
 
-    // SELECTOR DE ALGORITMO (encogido)
+    // SELECTOR DE ALGORITMO (mas pequeño)
     float availWidth = ImGui::GetContentRegionAvail().x;
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availWidth - 100));
 
     MovementAlgorithm currentAlgo = GetRunnerAlgorithm(i);
-    const char* algoNames[] = { "Random", "A*", "Seek (dumb)", "Seek (smart)" };  // Nombres mas cortos
+    const char* algoNames[] = { "Random", "A*", "Seek", "Seek+" };
     int currentAlgoIndex = static_cast<int>(currentAlgo);
 
     ImGui::PushItemWidth(100);  // Ancho reducido de 150 a 100
@@ -364,17 +362,48 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     ImGui::SameLine();
 
-    // Boton para resetear a meta por defecto (tambien deshabilitado si no esta vivo)
+    // Boton para resetear a meta por defecto
     if (ImGui::Button("Reset")) {
       if (canEdit) {
         ResetRunnerGoal(i);
       }
     }
 
+    // Cierra el BeginDisabled de los inputs + Reset
     if (!canEdit) {
       ImGui::EndDisabled();
     }
 
+    ImGui::SameLine();
+
+    // Boton STOP - Solo activo si esta vivo y NO pausado
+    bool isRunnerPaused = IsRunnerPaused(i);
+    bool disableStop = !canEdit || isRunnerPaused;
+
+    if (disableStop) {
+      ImGui::BeginDisabled();
+    }
+    if (ImGui::Button("Stop##stop")) {
+      SetRunnerPaused(i, true);
+    }
+    if (disableStop) {
+      ImGui::EndDisabled();
+    }
+
+    ImGui::SameLine();
+
+    // Boton PLAY - Solo activo si esta vivo y pausado
+    bool disablePlay = !canEdit || !isRunnerPaused;
+
+    if (disablePlay) {
+      ImGui::BeginDisabled();
+    }
+    if (ImGui::Button("Play##play")) {
+      SetRunnerPaused(i, false);
+    }
+    if (disablePlay) {
+      ImGui::EndDisabled();
+    }
     ImGui::Unindent(25.0f);
 
     ImGui::Separator();
@@ -403,7 +432,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.4f, 1.0f, 0.4f, 1.0f));
-  if (ImGui::Button("RESTART GAME", ImVec2(335, 80))) {
+  if (ImGui::Button("RESTART GAME", ImVec2(380, 80))) {
     RestartGame();
     currentBrush = BrushMode::NONE;  // Deselecciona brush
     selectedMario = -1;  // Deselecciona Mario

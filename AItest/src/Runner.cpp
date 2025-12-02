@@ -81,7 +81,7 @@ void InitRunners() {
     runners[i].x = spawnSlabs[spawnPos].x;
     runners[i].y = spawnSlabs[spawnPos].y;
 
-    runners[i].lastX = runners[i].x;   // Así el Mario no ira hacia atrás
+    runners[i].lastX = runners[i].x;   // Asi el Mario no ira hacia atras
     runners[i].lastY = runners[i].y;
 
     runners[i].r = rand() % 256;
@@ -346,7 +346,7 @@ static void UpdateRunnerSeekSmart(Runner& r)
     MoveRunnerTo(r, bestX, bestY);
   }
   else {
-    // Si aun así no hay nada razonable, se comporta como random
+    // Si aun asi no hay nada razonable, se comporta como random
     UpdateRunnerRandom(r);
   }
 }
@@ -367,61 +367,156 @@ void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer)
   if (currentRunnerTime >= runnerTimer) {
     for (int i = 0; i < kRunnerQuantity; i++) {
       if (runners[i].state == 1) {
-        switch (runners[i].algorithm) {
-
-        case MovementAlgorithm::A_STAR:
-        {
-          // --- código A* tal y como lo tenías ---
+        /*
+        // Algoritmo A*
+        if (runners[i].algorithm == MovementAlgorithm::A_STAR) {
+          // Si no tiene camino o lo completo, recalcula
           if (runners[i].pathLength == 0 || runners[i].pathIndex >= runners[i].pathLength) {
             CalculateAStarPath(runners[i]);
           }
 
+          // Sigue el camino
           if (runners[i].pathIndex < runners[i].pathLength) {
             int nextX = runners[i].pathX[runners[i].pathIndex];
             int nextY = runners[i].pathY[runners[i].pathIndex];
 
+            // Verifica si la celda sigue siendo transitable
             if (slabs[nextY][nextX].transitable && slabs[nextY][nextX].type != 0) {
-
-              runners[i].lastX = runners[i].x;
-              runners[i].lastY = runners[i].y;
-
               runners[i].x = nextX;
               runners[i].y = nextY;
 
-              if (runners[i].pathIndex > 0) {
-                if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
-                  runners[i].direction = 2; // Izquierda
-                }
-                else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
-                  runners[i].direction = 3; // Derecha
-                }
+              // Actualiza direccion para animacion
+              if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
+                runners[i].direction = 2; // Izquierda
+              }
+              else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
+                runners[i].direction = 3; // Derecha
               }
 
               runners[i].pathIndex++;
 
+              // ¿Llego a la meta?
+              // Comprueba si llego a su objetivo personalizado
               if (nextX == runners[i].goalX && nextY == runners[i].goalY) {
                 runners[i].state = 2; // Victoria
               }
             }
             else {
+              // El camino ya no es valido, recalcula
               runners[i].pathLength = 0;
             }
           }
         }
-        break;
+        // Algoritmo aleatorio (original)
+        else {
+          int x = runners[i].x;
+          int y = runners[i].y;
 
-        case MovementAlgorithm::RANDOM:
-          UpdateRunnerRandom(runners[i]);
+          slab top = slabs[y - 1][x];
+          slab bottom = slabs[y + 1][x];
+          slab left = slabs[y][x - 1];
+          slab right = slabs[y][x + 1];
+
+          int choices = 0;
+          slab possibleslabs[4];
+          int dir[4];
+
+          if (top.type != 0 && top.transitable) {
+            possibleslabs[choices] = top;
+            dir[choices] = 0;
+            choices++;
+          }
+          if (bottom.type != 0 && bottom.transitable) {
+            possibleslabs[choices] = bottom;
+            dir[choices] = 1;
+            choices++;
+          }
+          if (left.type != 0 && left.transitable) {
+            possibleslabs[choices] = left;
+            dir[choices] = 2;
+            choices++;
+          }
+          if (right.type != 0 && right.transitable) {
+            possibleslabs[choices] = right;
+            dir[choices] = 3;
+            choices++;
+          }
+
+          if (choices != 0) {
+            int nextSlab = rand() % choices;
+            runners[i].x = possibleslabs[nextSlab].x;
+            runners[i].y = possibleslabs[nextSlab].y;
+
+            if (dir[nextSlab] > 1) {
+              runners[i].direction = dir[nextSlab];
+            }
+
+            // Verifica si llego a su objetivo
+            if (possibleslabs[nextSlab].x == runners[i].goalX &&
+              possibleslabs[nextSlab].y == runners[i].goalY) {
+              runners[i].state = 2;  // Victoria
+            }
+          }
+        }*/
+        if (runners[i].state == 1 && !runners[i].isPaused) {
+
+          switch (runners[i].algorithm) {
+
+          case MovementAlgorithm::A_STAR:
+          {
+            // --- codigo A* tal y como lo tenias ---
+            if (runners[i].pathLength == 0 || runners[i].pathIndex >= runners[i].pathLength) {
+              CalculateAStarPath(runners[i]);
+            }
+
+            if (runners[i].pathIndex < runners[i].pathLength) {
+              int nextX = runners[i].pathX[runners[i].pathIndex];
+              int nextY = runners[i].pathY[runners[i].pathIndex];
+
+              if (slabs[nextY][nextX].transitable && slabs[nextY][nextX].type != 0) {
+
+                runners[i].lastX = runners[i].x;
+                runners[i].lastY = runners[i].y;
+
+                runners[i].x = nextX;
+                runners[i].y = nextY;
+
+                if (runners[i].pathIndex > 0) {
+                  if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
+                    runners[i].direction = 2; // Izquierda
+                  }
+                  else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
+                    runners[i].direction = 3; // Derecha
+                  }
+                }
+
+                runners[i].pathIndex++;
+
+                if (nextX == runners[i].goalX && nextY == runners[i].goalY) {
+                  runners[i].state = 2; // Victoria
+                }
+              }
+              else {
+                runners[i].pathLength = 0;
+              }
+            }
+          }
           break;
 
-        case MovementAlgorithm::SEEK_DUMB:
-          UpdateRunnerSeekDumb(runners[i]);
-          break;
+          case MovementAlgorithm::RANDOM:
+            UpdateRunnerRandom(runners[i]);
+            break;
 
-        case MovementAlgorithm::SEEK_SMART:
-          UpdateRunnerSeekSmart(runners[i]);
-          break;
+          case MovementAlgorithm::SEEK_DUMB:
+            UpdateRunnerSeekDumb(runners[i]);
+            break;
+
+          case MovementAlgorithm::SEEK_SMART:
+            UpdateRunnerSeekSmart(runners[i]);
+            break;
+          }
         }
+
       }
     }
     currentRunnerTime = 0.0f;
@@ -650,4 +745,16 @@ bool CalculateAStarPath(Runner& runner) {
   }
 
   return false; // No se encontro camino
+}
+void SetRunnerPaused(int runnerIndex, bool paused) {
+  if (runnerIndex >= 0 && runnerIndex < kRunnerQuantity) {
+    runners[runnerIndex].isPaused = paused;
+  }
+}
+
+bool IsRunnerPaused(int runnerIndex) {
+  if (runnerIndex >= 0 && runnerIndex < kRunnerQuantity) {
+    return runners[runnerIndex].isPaused;
+  }
+  return false;
 }
