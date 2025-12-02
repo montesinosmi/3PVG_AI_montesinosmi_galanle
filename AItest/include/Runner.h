@@ -5,7 +5,9 @@
 // Enumeracion de algoritmos de movimiento
 enum class MovementAlgorithm {
   RANDOM = 0,
-  A_STAR = 1
+  A_STAR = 1,
+  SEEK_DUMB = 2,   // Seek tipo Pac-Man, greedy
+  SEEK_SMART = 3    // Seek mejorado (evita reversas)
 };
 
 // Estructura de un runner/NPC
@@ -16,6 +18,10 @@ struct Runner {
   int state = 1;        // 0: Dead, 1: Alive, 2: Safe
   int direction = 0;
   MovementAlgorithm algorithm = MovementAlgorithm::RANDOM;
+
+  // Ultima posicion para evitar ir hacia atras en el seek listo
+  int lastX = 0;
+  int lastY = 0;
 
   float lifeTime;        // Tiempo total de vida
   float currentAlgoTime; // Tiempo con el algoritmo actual

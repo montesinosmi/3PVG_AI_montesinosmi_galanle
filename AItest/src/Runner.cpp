@@ -81,6 +81,9 @@ void InitRunners() {
     runners[i].x = spawnSlabs[spawnPos].x;
     runners[i].y = spawnSlabs[spawnPos].y;
 
+    runners[i].lastX = runners[i].x;   // Así el Mario no ira hacia atrás
+    runners[i].lastY = runners[i].y;
+
     runners[i].r = rand() % 256;
     runners[i].g = rand() % 256;
     runners[i].b = rand() % 256;
@@ -133,6 +136,222 @@ void DrawGoalFlags(SDL_Renderer* renderer) {
   }
 }
 
+
+
+
+// ------------------------------------------
+// Helpers comunes para todos los algoritmos
+// ------------------------------------------
+
+static bool IsWalkable(int x, int y)
+{
+  if (x < 0 || x >= kMapWidth || y < 0 || y >= kMapHeight)
+    return false;
+
+  // type == 0 son muros, y tambien respetamos transitable
+  return (slabs[y][x].type != 0 && slabs[y][x].transitable);
+}
+
+// Mueve al runner a (nx, ny) si es walkable, actualiza direccion y goal
+static bool MoveRunnerTo(Runner& r, int nx, int ny)
+{
+  if (!IsWalkable(nx, ny))
+    return false;
+
+  r.lastX = r.x;
+  r.lastY = r.y;
+
+  // Direccion solo afecta a la animacion (izquierda/derecha)
+  if (nx < r.x)      r.direction = 2; // Izquierda
+  else if (nx > r.x) r.direction = 3; // Derecha
+
+  r.x = nx;
+  r.y = ny;
+
+  // ¿ha llegado a su objetivo?
+  if (r.goalX != -1 && r.goalY != -1 &&
+    r.x == r.goalX && r.y == r.goalY)
+  {
+    r.state = 2; // Victoria
+  }
+
+  return true;
+}
+
+// Movimiento RANDOM reutilizado como helper
+static void UpdateRunnerRandom(Runner& r)
+{
+  int x = r.x;
+  int y = r.y;
+
+  slab top = slabs[y - 1][x];
+  slab bottom = slabs[y + 1][x];
+  slab left = slabs[y][x - 1];
+  slab right = slabs[y][x + 1];
+
+  int choices = 0;
+  slab possibleslabs[4];
+  int dir[4];
+
+  if (top.type != 0 && top.transitable) {
+    possibleslabs[choices] = top;
+    dir[choices] = 0;
+    choices++;
+  }
+  if (bottom.type != 0 && bottom.transitable) {
+    possibleslabs[choices] = bottom;
+    dir[choices] = 1;
+    choices++;
+  }
+  if (left.type != 0 && left.transitable) {
+    possibleslabs[choices] = left;
+    dir[choices] = 2;
+    choices++;
+  }
+  if (right.type != 0 && right.transitable) {
+    possibleslabs[choices] = right;
+    dir[choices] = 3;
+    choices++;
+  }
+
+  if (choices != 0) {
+    int nextSlab = rand() % choices;
+
+    r.lastX = r.x;
+    r.lastY = r.y;
+
+    r.x = possibleslabs[nextSlab].x;
+    r.y = possibleslabs[nextSlab].y;
+
+    if (dir[nextSlab] > 1) {
+      r.direction = dir[nextSlab];
+    }
+
+    // Verifica si llego a su objetivo
+    if (possibleslabs[nextSlab].x == r.goalX &&
+      possibleslabs[nextSlab].y == r.goalY) {
+      r.state = 2;  // Victoria
+    }
+  }
+}
+// SEEK TONTO: siempre intenta reducir la distancia Manhattan al goal
+static void UpdateRunnerSeekDumb(Runner& r)
+{
+  if (r.goalX == -1 || r.goalY == -1) {
+    // si no hay objetivo, se comporta como random
+    UpdateRunnerRandom(r);
+    return;
+  }
+
+  int bestX = r.x;
+  int bestY = r.y;
+  int bestDist = abs(r.x - r.goalX) + abs(r.y - r.goalY);
+
+  // Vecinos: arriba, abajo, izquierda, derecha
+  const int dx[4] = { 0,  0, -1, 1 };
+  const int dy[4] = { -1, 1,  0, 0 };
+
+  for (int i = 0; i < 4; ++i) {
+    int nx = r.x + dx[i];
+    int ny = r.y + dy[i];
+
+    if (!IsWalkable(nx, ny))
+      continue;
+
+    int dist = abs(nx - r.goalX) + abs(ny - r.goalY);
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestX = nx;
+      bestY = ny;
+    }
+  }
+
+  if (bestX != r.x || bestY != r.y) {
+    // Hemos encontrado una casilla que mejora la distancia
+    MoveRunnerTo(r, bestX, bestY);
+  }
+  else {
+    // No mejora nada -> fallback a random para no quedarse bloqueado
+    UpdateRunnerRandom(r);
+  }
+}
+// SEEK LISTO: evita ir hacia la casilla anterior si puede
+static void UpdateRunnerSeekSmart(Runner& r)
+{
+  if (r.goalX == -1 || r.goalY == -1) {
+    UpdateRunnerRandom(r);
+    return;
+  }
+
+  int currentDist = abs(r.x - r.goalX) + abs(r.y - r.goalY);
+
+  const int dx[4] = { 0,  0, -1, 1 };
+  const int dy[4] = { -1, 1,  0, 0 };
+
+  // Primera pasada: buscamos vecinos que mejoren la distancia
+  // y que NO sean la casilla anterior (lastX,lastY)
+  int bestX = r.x;
+  int bestY = r.y;
+  int bestDist = currentDist;
+  bool foundBetterNoReverse = false;
+
+  for (int i = 0; i < 4; ++i) {
+    int nx = r.x + dx[i];
+    int ny = r.y + dy[i];
+
+    if (!IsWalkable(nx, ny))
+      continue;
+
+    // Casilla "reverse" respecto al paso anterior
+    bool isReverse = (nx == r.lastX && ny == r.lastY);
+
+    int dist = abs(nx - r.goalX) + abs(ny - r.goalY);
+    if (!isReverse && dist < bestDist) {
+      bestDist = dist;
+      bestX = nx;
+      bestY = ny;
+      foundBetterNoReverse = true;
+    }
+  }
+
+  if (foundBetterNoReverse) {
+    MoveRunnerTo(r, bestX, bestY);
+    return;
+  }
+
+  // Segunda pasada: si no hemos encontrado nada mejor sin reversa,
+  // aceptamos reversa o empates de distancia
+  bestX = r.x;
+  bestY = r.y;
+  bestDist = currentDist;
+  bool foundAny = false;
+
+  for (int i = 0; i < 4; ++i) {
+    int nx = r.x + dx[i];
+    int ny = r.y + dy[i];
+
+    if (!IsWalkable(nx, ny))
+      continue;
+
+    int dist = abs(nx - r.goalX) + abs(ny - r.goalY);
+    if (dist <= bestDist) {
+      bestDist = dist;
+      bestX = nx;
+      bestY = ny;
+      foundAny = true;
+    }
+  }
+
+  if (foundAny && (bestX != r.x || bestY != r.y)) {
+    MoveRunnerTo(r, bestX, bestY);
+  }
+  else {
+    // Si aun así no hay nada razonable, se comporta como random
+    UpdateRunnerRandom(r);
+  }
+}
+
+
 void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer) {
   currentRunnerTime += deltaTime;
 
@@ -148,96 +367,60 @@ void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer)
   if (currentRunnerTime >= runnerTimer) {
     for (int i = 0; i < kRunnerQuantity; i++) {
       if (runners[i].state == 1) {
+        switch (runners[i].algorithm) {
 
-        // Algoritmo A*
-        if (runners[i].algorithm == MovementAlgorithm::A_STAR) {
-          // Si no tiene camino o lo completo, recalcula
+        case MovementAlgorithm::A_STAR:
+        {
+          // --- código A* tal y como lo tenías ---
           if (runners[i].pathLength == 0 || runners[i].pathIndex >= runners[i].pathLength) {
             CalculateAStarPath(runners[i]);
           }
 
-          // Sigue el camino
           if (runners[i].pathIndex < runners[i].pathLength) {
             int nextX = runners[i].pathX[runners[i].pathIndex];
             int nextY = runners[i].pathY[runners[i].pathIndex];
 
-            // Verifica si la celda sigue siendo transitable
             if (slabs[nextY][nextX].transitable && slabs[nextY][nextX].type != 0) {
+
+              runners[i].lastX = runners[i].x;
+              runners[i].lastY = runners[i].y;
+
               runners[i].x = nextX;
               runners[i].y = nextY;
 
-              // Actualiza direccion para animacion
-              if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
-                runners[i].direction = 2; // Izquierda
-              }
-              else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
-                runners[i].direction = 3; // Derecha
+              if (runners[i].pathIndex > 0) {
+                if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
+                  runners[i].direction = 2; // Izquierda
+                }
+                else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
+                  runners[i].direction = 3; // Derecha
+                }
               }
 
               runners[i].pathIndex++;
 
-              // ¿Llego a la meta?
-              // Comprueba si llego a su objetivo personalizado
               if (nextX == runners[i].goalX && nextY == runners[i].goalY) {
                 runners[i].state = 2; // Victoria
               }
             }
             else {
-              // El camino ya no es valido, recalcula
               runners[i].pathLength = 0;
             }
           }
         }
-        // Algoritmo aleatorio (original)
-        else {
-          int x = runners[i].x;
-          int y = runners[i].y;
+        break;
 
-          slab top = slabs[y - 1][x];
-          slab bottom = slabs[y + 1][x];
-          slab left = slabs[y][x - 1];
-          slab right = slabs[y][x + 1];
+        case MovementAlgorithm::RANDOM:
+          UpdateRunnerRandom(runners[i]);
+          break;
 
-          int choices = 0;
-          slab possibleslabs[4];
-          int dir[4];
+        case MovementAlgorithm::SEEK_DUMB:
+          UpdateRunnerSeekDumb(runners[i]);
+          break;
 
-          if (top.type != 0 && top.transitable) {
-            possibleslabs[choices] = top;
-            dir[choices] = 0;
-            choices++;
-          }
-          if (bottom.type != 0 && bottom.transitable) {
-            possibleslabs[choices] = bottom;
-            dir[choices] = 1;
-            choices++;
-          }
-          if (left.type != 0 && left.transitable) {
-            possibleslabs[choices] = left;
-            dir[choices] = 2;
-            choices++;
-          }
-          if (right.type != 0 && right.transitable) {
-            possibleslabs[choices] = right;
-            dir[choices] = 3;
-            choices++;
-          }
-
-          if (choices != 0) {
-            int nextSlab = rand() % choices;
-            runners[i].x = possibleslabs[nextSlab].x;
-            runners[i].y = possibleslabs[nextSlab].y;
-
-            if (dir[nextSlab] > 1) {
-              runners[i].direction = dir[nextSlab];
-            }
-
-            // Verifica si llego a su objetivo
-            if (possibleslabs[nextSlab].x == runners[i].goalX &&
-              possibleslabs[nextSlab].y == runners[i].goalY) {
-              runners[i].state = 2;  // Victoria
-            }
-          }
+        case MovementAlgorithm::SEEK_SMART:
+          UpdateRunnerSeekSmart(runners[i]);
+          break;
         }
       }
     }

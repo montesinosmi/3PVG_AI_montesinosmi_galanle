@@ -315,16 +315,16 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     ImGui::SameLine();
 
-    // SELECTOR DE ALGORITMO (mas pequeño)
+    // SELECTOR DE ALGORITMO (encogido)
     float availWidth = ImGui::GetContentRegionAvail().x;
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availWidth - 100));
 
     MovementAlgorithm currentAlgo = GetRunnerAlgorithm(i);
-    const char* algoNames[] = { "Random", "A*" };  // Nombres mas cortos
+    const char* algoNames[] = { "Random", "A*", "Seek (dumb)", "Seek (smart)" };  // Nombres mas cortos
     int currentAlgoIndex = static_cast<int>(currentAlgo);
 
     ImGui::PushItemWidth(100);  // Ancho reducido de 150 a 100
-    if (ImGui::Combo("##algo", &currentAlgoIndex, algoNames, 2)) {
+    if (ImGui::Combo("##algo", &currentAlgoIndex, algoNames, 4)) {
       SetRunnerAlgorithm(i, static_cast<MovementAlgorithm>(currentAlgoIndex));
     }
     ImGui::PopItemWidth();
