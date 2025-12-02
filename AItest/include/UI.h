@@ -1,5 +1,6 @@
 #pragma once
 #include "../deps/SDL2-2.32.8/include/SDL.h"
+#include "Config.h"
 
 // Inicializa ImGUI
 void InitImGUI(SDL_Window* window, SDL_Renderer* renderer);
@@ -8,9 +9,11 @@ void InitImGUI(SDL_Window* window, SDL_Renderer* renderer);
 void PositionSizeImGUI(float pos_x, float pos_y, float size_x, float size_y);
 
 // Renderiza el panel de control de ImGUI
-void RenderImGUI(SDL_Renderer* renderer, 
-                 float& worldTimer, float& runnerTimer,
-                 float currentWorldTime, float currentRunnerTime);
+void RenderImGUI(SDL_Renderer* renderer,
+  float& worldTimer, float& runnerTimer,
+  float currentWorldTime, float currentRunnerTime,
+  int& selectedMario,
+  BrushMode& currentBrush);
 
 // Limpia recursos de ImGUI
 void ShutdownImGUI();

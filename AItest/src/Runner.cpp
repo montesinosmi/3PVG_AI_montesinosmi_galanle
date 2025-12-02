@@ -13,7 +13,7 @@ struct AStarNode {
   int hCost; // Heuristica hasta meta
   int fCost() const { return gCost + hCost; }
   int parentX, parentY;
-  
+
   bool operator<(const AStarNode& other) const {
     return fCost() < other.fCost();
   }
@@ -26,7 +26,7 @@ void InitRunners() {
   // Recolecta todas las celdas de spawn
   slab spawnSlabs[kMapHeight * kMapWidth];
   int spawnCellQuantity = 0;
-  
+
   for (int i = 0; i < kMapHeight; i++) {
     for (int j = 0; j < kMapWidth; j++) {
       if (slabs[i][j].type == 5) {
@@ -36,17 +36,19 @@ void InitRunners() {
     }
   }
 
-  //if (spawnCellQuantity == 0) {
-  //  printf("\n[InitRunners] No hay celdas de spawn (tipo 5). "
-  //    "Revisa assets/Maps/map_1.txt o las rutas.\n");
-  //  // Marcamos como muertos / inactivos
-  //  for (int i = 0; i < kRunnerQuantity; ++i) {
-  //    runners[i].x = 0;
-  //    runners[i].y = 0;
-  //    runners[i].state = 0;
-  //  }
-  //  return;
-  //}
+  // Busca la meta por defecto (tipo 2) para usarla como referencia
+  int defaultGoalX = -1;
+  int defaultGoalY = -1;
+  for (int y = 0; y < kMapHeight; y++) {
+    for (int x = 0; x < kMapWidth; x++) {
+      if (slabs[y][x].type == 2) {
+        defaultGoalX = x;
+        defaultGoalY = y;
+        break;
+      }
+    }
+    if (defaultGoalX != -1) break;
+  }
 
   // Inicializa cada runner en una posicion de spawn aleatoria
   for (int i = 0; i < kRunnerQuantity; i++) {
@@ -56,11 +58,29 @@ void InitRunners() {
 
     runners[i].lifeTime = 0.0f;
     runners[i].currentAlgoTime = 0.0f;
-    
+
+    // Inicializa objetivos ALINEADOS a la derecha de la meta por defecto
+    if (defaultGoalX != -1 && defaultGoalY != -1) {
+      // Coloca los objetivos en linea horizontal a la derecha
+      int offsetX = i;  // Desplazamiento horizontal por indice
+      runners[i].goalX = defaultGoalX + offsetX;
+      runners[i].goalY = defaultGoalY;
+
+      // Asegura que no se salga del mapa
+      if (runners[i].goalX >= kMapWidth) {
+        runners[i].goalX = kMapWidth - 1;
+      }
+    }
+    else {
+      // Fallback: si no hay meta por defecto, usa coordenadas arbitrarias
+      runners[i].goalX = 10 + i;
+      runners[i].goalY = 10;
+    }
+
     int spawnPos = rand() % spawnCellQuantity;
     runners[i].x = spawnSlabs[spawnPos].x;
     runners[i].y = spawnSlabs[spawnPos].y;
-    
+
     runners[i].r = rand() % 256;
     runners[i].g = rand() % 256;
     runners[i].b = rand() % 256;
@@ -69,39 +89,53 @@ void InitRunners() {
 
 void DrawRunners(SDL_Renderer* renderer) {
   for (int i = 0; i < kRunnerQuantity; i++) {
-    switch(runners[i].state) {
-      case 0:  // Muerto
-        DrawCell(renderer, deadtex, runners[i].x * kTexSize * kScale, 
-                 runners[i].y * kTexSize * kScale);
-        break;
+    // Aplica offset X para que los runners se dibujen en el mapa desplazado
+    int posX = kMapOffsetX + (runners[i].x * kTexSize * kScale);
+    int posY = runners[i].y * kTexSize * kScale;
 
-      case 1:  // Vivo
-        switch(runners[i].direction) {
-          case 2:  // Izquierda
-            DrawCell(renderer, npctex, runners[i].x * kTexSize * kScale, 
-                     runners[i].y * kTexSize * kScale, 
-                     runners[i].r, runners[i].g, runners[i].b, true);
-            break;
-          case 3:  // Derecha
-            DrawCell(renderer, npctex, runners[i].x * kTexSize * kScale, 
-                     runners[i].y * kTexSize * kScale, 
-                     runners[i].r, runners[i].g, runners[i].b, false);
-            break;
-        }
-        break;
+    switch (runners[i].state) {
+    case 0:  // Muerto
+      DrawCell(renderer, deadtex, posX, posY);
+      break;
 
-      case 2:  // Victoria
-        DrawCell(renderer, victorytex, runners[i].x * kTexSize * kScale, 
-                 runners[i].y * kTexSize * kScale, 
-                 runners[i].r, runners[i].g, runners[i].b);
+    case 1:  // Vivo
+      switch (runners[i].direction) {
+      case 2:  // Izquierda
+        DrawCell(renderer, npctex, posX, posY,
+          runners[i].r, runners[i].g, runners[i].b, true);
         break;
+      case 3:  // Derecha
+        DrawCell(renderer, npctex, posX, posY,
+          runners[i].r, runners[i].g, runners[i].b, false);
+        break;
+      }
+      break;
+
+    case 2:  // Victoria
+      DrawCell(renderer, victorytex, posX, posY,
+        runners[i].r, runners[i].g, runners[i].b);
+      break;
+    }
+  }
+}
+
+void DrawGoalFlags(SDL_Renderer* renderer) {
+  for (int i = 0; i < kRunnerQuantity; i++) {
+    // Solo dibuja bandera si el Mario esta VIVO (no muerto, no llego a meta)
+    if (runners[i].goalX != -1 && runners[i].goalY != -1 && runners[i].state == 1) {
+      // Aplica offset X para que las banderas se dibujen en el mapa desplazado
+      int posX = kMapOffsetX + (runners[i].goalX * kTexSize * kScale);
+      int posY = runners[i].goalY * kTexSize * kScale;
+
+      DrawCell(renderer, finishtex, posX, posY,
+        runners[i].r, runners[i].g, runners[i].b);
     }
   }
 }
 
 void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer) {
   currentRunnerTime += deltaTime;
-  
+
   // Actualizar contadores de tiempo fuera del if del timer de movimiento
   for (int i = 0; i < kRunnerQuantity; i++) {
     if (runners[i].state == 1) { // Solo si esta VIVO
@@ -114,38 +148,41 @@ void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer)
   if (currentRunnerTime >= runnerTimer) {
     for (int i = 0; i < kRunnerQuantity; i++) {
       if (runners[i].state == 1) {
-        
+
         // Algoritmo A*
         if (runners[i].algorithm == MovementAlgorithm::A_STAR) {
           // Si no tiene camino o lo completo, recalcula
           if (runners[i].pathLength == 0 || runners[i].pathIndex >= runners[i].pathLength) {
             CalculateAStarPath(runners[i]);
           }
-          
+
           // Sigue el camino
           if (runners[i].pathIndex < runners[i].pathLength) {
             int nextX = runners[i].pathX[runners[i].pathIndex];
             int nextY = runners[i].pathY[runners[i].pathIndex];
-            
+
             // Verifica si la celda sigue siendo transitable
             if (slabs[nextY][nextX].transitable && slabs[nextY][nextX].type != 0) {
               runners[i].x = nextX;
               runners[i].y = nextY;
-              
+
               // Actualiza direccion para animacion
               if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
                 runners[i].direction = 2; // Izquierda
-              } else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
+              }
+              else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
                 runners[i].direction = 3; // Derecha
               }
-              
+
               runners[i].pathIndex++;
-              
+
               // ¿Llego a la meta?
-              if (slabs[nextY][nextX].type == 2) {
+              // Comprueba si llego a su objetivo personalizado
+              if (nextX == runners[i].goalX && nextY == runners[i].goalY) {
                 runners[i].state = 2; // Victoria
               }
-            } else {
+            }
+            else {
               // El camino ya no es valido, recalcula
               runners[i].pathLength = 0;
             }
@@ -155,16 +192,16 @@ void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer)
         else {
           int x = runners[i].x;
           int y = runners[i].y;
-          
+
           slab top = slabs[y - 1][x];
           slab bottom = slabs[y + 1][x];
           slab left = slabs[y][x - 1];
           slab right = slabs[y][x + 1];
-          
+
           int choices = 0;
           slab possibleslabs[4];
           int dir[4];
-          
+
           if (top.type != 0 && top.transitable) {
             possibleslabs[choices] = top;
             dir[choices] = 0;
@@ -185,17 +222,19 @@ void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer)
             dir[choices] = 3;
             choices++;
           }
-          
+
           if (choices != 0) {
             int nextSlab = rand() % choices;
             runners[i].x = possibleslabs[nextSlab].x;
             runners[i].y = possibleslabs[nextSlab].y;
-            
+
             if (dir[nextSlab] > 1) {
               runners[i].direction = dir[nextSlab];
             }
-            
-            if (possibleslabs[nextSlab].type == 2) {
+
+            // Verifica si llego a su objetivo
+            if (possibleslabs[nextSlab].x == runners[i].goalX &&
+              possibleslabs[nextSlab].y == runners[i].goalY) {
               runners[i].state = 2;  // Victoria
             }
           }
@@ -245,6 +284,35 @@ MovementAlgorithm GetRunnerAlgorithm(int runnerIndex) {
   return MovementAlgorithm::RANDOM;
 }
 
+void SetRunnerGoal(int runnerIndex, int goalX, int goalY) {
+  if (runnerIndex >= 0 && runnerIndex < kRunnerQuantity) {
+    runners[runnerIndex].goalX = goalX;
+    runners[runnerIndex].goalY = goalY;
+    // Forzar recalculo del camino
+    runners[runnerIndex].pathLength = 0;
+    runners[runnerIndex].pathIndex = 0;
+  }
+}
+
+void ResetRunnerGoal(int runnerIndex) {
+  if (runnerIndex >= 0 && runnerIndex < kRunnerQuantity) {
+    // Busca la meta por defecto (tipo 2)
+    for (int y = 0; y < kMapHeight; y++) {
+      for (int x = 0; x < kMapWidth; x++) {
+        if (slabs[y][x].type == 2) {
+          runners[runnerIndex].goalX = x;
+          runners[runnerIndex].goalY = y;
+          break;
+        }
+      }
+      if (runners[runnerIndex].goalX != -1) break;
+    }
+    // Forzar recalculo del camino
+    runners[runnerIndex].pathLength = 0;
+    runners[runnerIndex].pathIndex = 0;
+  }
+}
+
 // Calcula distancia Manhattan (heuristica para A*)
 int ManhattanDistance(int x1, int y1, int x2, int y2) {
   return abs(x1 - x2) + abs(y1 - y2);
@@ -271,16 +339,24 @@ bool FindGoalPosition(int& goalX, int& goalY) {
 // Implementacion del algoritmo A*
 bool CalculateAStarPath(Runner& runner) {
   int goalX, goalY;
-  if (!FindGoalPosition(goalX, goalY)) {
-    return false;
+
+  // Usa objetivo personalizado (siempre esta definido ahora)
+  goalX = runner.goalX;
+  goalY = runner.goalY;
+
+  // Si por alguna razon no tiene objetivo, busca meta por defecto
+  if (goalX == -1 || goalY == -1) {
+    if (!FindGoalPosition(goalX, goalY)) {
+      return false;
+    }
   }
-  
+
   // Listas para A*
   AStarNode openList[kMapHeight * kMapWidth];
   int openCount = 0;
-  bool closedList[kMapHeight][kMapWidth] = {false};
+  bool closedList[kMapHeight][kMapWidth] = { false };
   AStarNode nodeData[kMapHeight][kMapWidth];
-  
+
   // Inicializa nodo de inicio
   AStarNode startNode;
   startNode.x = runner.x;
@@ -289,10 +365,10 @@ bool CalculateAStarPath(Runner& runner) {
   startNode.hCost = ManhattanDistance(runner.x, runner.y, goalX, goalY);
   startNode.parentX = -1;
   startNode.parentY = -1;
-  
+
   openList[openCount++] = startNode;
   nodeData[runner.y][runner.x] = startNode;
-  
+
   // Busqueda A*
   while (openCount > 0) {
     // Encuentra nodo con menor fCost
@@ -302,64 +378,64 @@ bool CalculateAStarPath(Runner& runner) {
         currentIndex = i;
       }
     }
-    
+
     AStarNode current = openList[currentIndex];
-    
+
     // Remueve de lista abierta
     for (int i = currentIndex; i < openCount - 1; i++) {
       openList[i] = openList[i + 1];
     }
     openCount--;
-    
+
     closedList[current.y][current.x] = true;
-    
+
     // ¿Llegamos a la meta?
     if (current.x == goalX && current.y == goalY) {
       // Reconstruye el camino
       runner.pathLength = 0;
       int px = current.x;
       int py = current.y;
-      
+
       while (px != -1 && py != -1) {
         runner.pathX[runner.pathLength] = px;
         runner.pathY[runner.pathLength] = py;
         runner.pathLength++;
-        
+
         int tempX = nodeData[py][px].parentX;
         int tempY = nodeData[py][px].parentY;
         px = tempX;
         py = tempY;
       }
-      
+
       // Invierte el camino (ahora va de inicio a meta)
       for (int i = 0; i < runner.pathLength / 2; i++) {
         std::swap(runner.pathX[i], runner.pathX[runner.pathLength - 1 - i]);
         std::swap(runner.pathY[i], runner.pathY[runner.pathLength - 1 - i]);
       }
-      
+
       runner.pathIndex = 1; // Empieza en 1 (0 es posicion actual)
       return true;
     }
-    
+
     // Explora vecinos
-    int dx[] = {0, 0, -1, 1};
-    int dy[] = {-1, 1, 0, 0};
-    
+    int dx[] = { 0, 0, -1, 1 };
+    int dy[] = { -1, 1, 0, 0 };
+
     for (int i = 0; i < 4; i++) {
       int nx = current.x + dx[i];
       int ny = current.y + dy[i];
-      
+
       // Verifica limites
       if (nx < 0 || nx >= kMapWidth || ny < 0 || ny >= kMapHeight) continue;
-      
+
       // Verifica si es transitable
       if (slabs[ny][nx].type == 0 || !slabs[ny][nx].transitable) continue;
-      
+
       // Verifica si ya esta en lista cerrada
       if (closedList[ny][nx]) continue;
-      
+
       int newGCost = current.gCost + 1;
-      
+
       // Busca si ya esta en lista abierta
       bool inOpenList = false;
       for (int j = 0; j < openCount; j++) {
@@ -374,7 +450,7 @@ bool CalculateAStarPath(Runner& runner) {
           break;
         }
       }
-      
+
       if (!inOpenList) {
         AStarNode neighbor;
         neighbor.x = nx;
@@ -383,12 +459,12 @@ bool CalculateAStarPath(Runner& runner) {
         neighbor.hCost = ManhattanDistance(nx, ny, goalX, goalY);
         neighbor.parentX = current.x;
         neighbor.parentY = current.y;
-        
+
         openList[openCount++] = neighbor;
         nodeData[ny][nx] = neighbor;
       }
     }
   }
-  
+
   return false; // No se encontro camino
 }

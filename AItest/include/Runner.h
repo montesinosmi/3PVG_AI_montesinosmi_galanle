@@ -19,7 +19,11 @@ struct Runner {
 
   float lifeTime;        // Tiempo total de vida
   float currentAlgoTime; // Tiempo con el algoritmo actual
-  
+
+  // Objetivo personalizado
+  int goalX = -1;        // -1 significa usar meta por defecto
+  int goalY = -1;
+
   // Para A* pathfinding
   int pathLength = 0;
   int pathIndex = 0;
@@ -36,6 +40,9 @@ void InitRunners();
 // Dibuja todos los runners en pantalla
 void DrawRunners(SDL_Renderer* renderer);
 
+// Dibuja las banderas de objetivos de los runners
+void DrawGoalFlags(SDL_Renderer* renderer);
+
 // Actualiza el comportamiento de los runners
 void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer);
 
@@ -50,3 +57,9 @@ void SetRunnerAlgorithm(int runnerIndex, MovementAlgorithm algorithm);
 
 // Obtiene el algoritmo actual de un runner
 MovementAlgorithm GetRunnerAlgorithm(int runnerIndex);
+
+// Establece un objetivo personalizado para un runner
+void SetRunnerGoal(int runnerIndex, int goalX, int goalY);
+
+// Resetea el objetivo a la meta por defecto
+void ResetRunnerGoal(int runnerIndex);

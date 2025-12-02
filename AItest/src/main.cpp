@@ -8,6 +8,7 @@
 #include "UI.h"
 #include "../deps/SDL2-2.32.8/include/SDL.h"
 #include "../deps/imgui/backends/imgui_impl_sdl2.h"
+#include "../deps/imgui/imgui.h"
 
 // Variables globales del nucleo de la aplicacion
 SDL_Renderer* renderer = nullptr;
@@ -19,14 +20,20 @@ float RunnerTimer = kDefaultRunnerTimer;
 float CurrentWorldTime = 0.0f;
 float CurrentRunnerTime = 0.0f;
 
+// Variable global para el Mario seleccionado (-1 = ninguno)
+int selectedMario = -1;
+
+// Variable global para el brush del editor de mapa
+BrushMode currentBrush = BrushMode::NONE;
+
 int main(int argc, char* argv[]) {
   srand(time(NULL));
-  
+
   // Inicializacion
   if (!Renderer_Create("AI", kWindowWidth, kWindowHeight, &window, &renderer)) {
     return -1;
   }
-  
+
   InitTextures(renderer);
   InitImGUI(window, renderer);
   InitSlabs();
@@ -41,23 +48,69 @@ int main(int argc, char* argv[]) {
     // Manejo de eventos
     while (SDL_PollEvent(&event)) {
       ImGui_ImplSDL2_ProcessEvent(&event);
+
       if (event.type == SDL_QUIT) {
         running = false;
       }
+
+      // Manejo de clicks del raton en el mapa
+      if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+        // Verifica si el click NO fue sobre una ventana de ImGui
+        ImGuiIO& io = ImGui::GetIO();
+        if (!io.WantCaptureMouse) {
+          int mouseX = event.button.x;
+          int mouseY = event.button.y;
+
+          // Resta el offset del mapa para obtener coordenadas relativas al mapa
+          int mapRelativeX = mouseX - kMapOffsetX;
+          int mapRelativeY = mouseY;
+
+          // Convierte coordenadas de pantalla a coordenadas del grid
+          int gridX = mapRelativeX / (kTexSize * kScale);
+          int gridY = mapRelativeY / (kTexSize * kScale);
+
+          // Valida que las coordenadas esten dentro del mapa
+          if (gridX >= 0 && gridX < kMapWidth && gridY >= 0 && gridY < kMapHeight) {
+
+            // PRIORIDAD 1: Editor de mapa (si hay brush seleccionado)
+            if (currentBrush != BrushMode::NONE) {
+              int type = static_cast<int>(currentBrush);
+              bool transitable = true;
+
+              // Lava/Rejilla siempre empieza abierta (transitable = true)
+              if (currentBrush == BrushMode::LAVA) {
+                type = 3;
+                transitable = true;
+              }
+
+              SetCellType(gridX, gridY, type, transitable);
+            }
+            // PRIORIDAD 2: Establecer objetivo de Mario (si hay Mario seleccionado)
+            else if (selectedMario >= 0 && selectedMario < kRunnerQuantity) {
+              // Solo permite cambiar objetivo si esta VIVO (state == 1)
+              if (runners[selectedMario].state == 1) {
+                SetRunnerGoal(selectedMario, gridX, gridY);
+              }
+            }
+          }
+        }
+      }
     }
-    
+
     // Limpia pantalla
     SDL_RenderClear(renderer);
-    
+
     // Actualiza logica del juego
     UpdateRunners(DeltaTime, CurrentRunnerTime, RunnerTimer);
     UpdateWorld(DeltaTime, CurrentWorldTime, WorldTimer);
-    
+
     // Renderizado
     DrawMaze(renderer);
+    DrawGoalFlags(renderer);  // Dibuja banderas ANTES de los runners para que aparezcan debajo
     DrawRunners(renderer);
-    RenderImGUI(renderer, WorldTimer, RunnerTimer, CurrentWorldTime, CurrentRunnerTime);
-      
+    RenderImGUI(renderer, WorldTimer, RunnerTimer, CurrentWorldTime, CurrentRunnerTime,
+      selectedMario, currentBrush);
+
     SDL_RenderPresent(renderer);
     SDL_Delay(10);
 
@@ -71,6 +124,6 @@ int main(int argc, char* argv[]) {
   ShutdownImGUI();
   Renderer_Destroy(window, renderer);
   SDL_Quit();
-  
+
   return 0;
 }

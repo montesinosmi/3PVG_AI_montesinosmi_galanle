@@ -22,3 +22,15 @@ void DrawMaze(SDL_Renderer* renderer);
 
 // Actualiza el estado del mundo (celdas transitables/no transitables)
 void UpdateWorld(float deltaTime, float& currentWorldTime, float worldTimer);
+
+// Resetea el mapa al estado original del archivo
+void ResetMap();
+
+// Cambia el tipo de una celda del mapa
+void SetCellType(int x, int y, int type, bool transitable);
+
+// Fuerza recalculo de todos los paths de los runners vivos
+void ForceRecalculateAllPaths();
+
+// Reinicia el juego completo (mapa + runners)
+void RestartGame();
