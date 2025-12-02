@@ -165,9 +165,9 @@ void ForceRecalculateAllPaths() {
 }
 
 void RestartGame() {
-  // 1. Resetea el mapa
+  // 1 Resetea el mapa
   ResetMap();
 
-  // 2. Reinicializa los runners (esto los pone vivos, en spawn, y con objetivos alineados)
+  // 2 Reinicializa los runners (esto los pone vivos, en spawn, y con objetivos alineados)
   InitRunners();
 }

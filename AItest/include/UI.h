@@ -13,7 +13,8 @@ void RenderImGUI(SDL_Renderer* renderer,
   float& worldTimer, float& runnerTimer,
   float currentWorldTime, float currentRunnerTime,
   int& selectedMario,
-  BrushMode& currentBrush);
+  BrushMode& currentBrush,
+  int& teleportMarioIndex);
 
 // Limpia recursos de ImGUI
 void ShutdownImGUI();

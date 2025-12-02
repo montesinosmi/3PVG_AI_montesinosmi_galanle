@@ -25,7 +25,8 @@ void RenderImGUI(SDL_Renderer* renderer,
   float& worldTimer, float& runnerTimer,
   float currentWorldTime, float currentRunnerTime,
   int& selectedMario,
-  BrushMode& currentBrush) {
+  BrushMode& currentBrush,
+  int& teleportMarioIndex) {
   ImGui_ImplSDL2_NewFrame();
   ImGui_ImplSDLRenderer2_NewFrame();
   ImGui::NewFrame();
@@ -176,9 +177,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   // Boton de reset del mapa
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
-  if (ImGui::Button("RESET MAP", ImVec2(380, 45))) {
+  if (ImGui::Button("RESET MAP", ImVec2(335, 45))) {
     ResetMap();
     currentBrush = BrushMode::NONE;  // Deselecciona brush al resetear
+    teleportMarioIndex = -1;  // Desactiva modo teleport
   }
   ImGui::PopStyleColor(2);
 
@@ -212,7 +214,9 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::Separator();
   ImGui::Spacing();
 
-  ImGui::TextWrapped("Tip: Use Lava to create dynamic obstacles!");
+  ImGui::TextWrapped("Programmers: Alvaro G. & Pablo M.");
+  ImGui::Spacing();
+  ImGui::TextWrapped("Professor: Gustavo Aranda");
 
   ImGui::End();
 
@@ -220,12 +224,17 @@ void RenderImGUI(SDL_Renderer* renderer,
   // PANEL DERECHO SUPERIOR - Mario Selector
   // ==========================================
   float rightPanelX = kMapOffsetX + kMapPixelWidth;
-  PositionSizeImGUI(rightPanelX, 0, kUIRightWidth, 570);
+  PositionSizeImGUI(rightPanelX, 0, kUIRightWidth, 640);
 
   ImGui::Begin("Mario Selector");
 
   // Instrucciones
-  if (currentBrush != BrushMode::NONE) {
+  if (teleportMarioIndex >= 0 && teleportMarioIndex < kRunnerQuantity) {
+    ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f),
+      "TELEPORT MODE - Click map to move Mario %d",
+      teleportMarioIndex + 1);
+  }
+  else if (currentBrush != BrushMode::NONE) {
     ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f),
       "MAP EDITOR MODE - Click map to paint");
   }
@@ -247,13 +256,14 @@ void RenderImGUI(SDL_Renderer* renderer,
     }
   }
   else {
-    ImGui::Text("Select a Mario and click on the map to set goal");
+    ImGui::Text("Choose a Mario before Nintendo sends the lawyers");
   }
   ImGui::Separator();
   ImGui::Spacing();
 
   for (int i = 0; i < kRunnerQuantity; i++) {
     ImGui::PushID(i);
+    ImGui::BeginGroup();
 
     // Determina si este Mario puede ser editado (solo si esta VIVO)
     bool canEdit = (runners[i].state == 1);
@@ -266,7 +276,7 @@ void RenderImGUI(SDL_Renderer* renderer,
       ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.7f, 0.0f, 1.0f));
     }
 
-    if (ImGui::Button(isSelected ? ">>>" : "Select", ImVec2(60, 0))) {
+    if (ImGui::Button(isSelected ? ">>>" : "Move Goal", ImVec2(70, 0))) {
       if (selectedMario == i) {
         selectedMario = -1; // Deseleccionar si ya estaba seleccionado
       }
@@ -296,82 +306,56 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     ImGui::SameLine();
 
-    // INFORMACIoN DE ESTADO Y TIEMPOS 
-    ImGui::BeginGroup();
+    // INFORMACION DE ESTADO Y TIEMPOS 
+    //ImGui::BeginGroup();
 
-    // Estado
+    // Linea 1: Estado
     const char* stateText = "???";
     if (runners[i].state == 0) stateText = "DEAD";
     else if (runners[i].state == 1) stateText = "ALIVE";
     else if (runners[i].state == 2) stateText = "SAFE";
     ImGui::Text("Mario %d [%s]", i + 1, stateText);
+    /*
+    // Linea 2: Pos + TP + Stop + Play
+    //ImGui::Indent(25.0f);
 
-    // Tiempos
-    ImGui::Text("Life: %.2fs | Algo: %.2fs", runners[i].lifeTime, runners[i].currentAlgoTime);
-
-    ImGui::EndGroup();
-
+    ImGui::Text("Pos:");
     ImGui::SameLine();
 
-    // SELECTOR DE ALGORITMO (mas pequeño)
-    float availWidth = ImGui::GetContentRegionAvail().x;
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availWidth - 100));
-
-    MovementAlgorithm currentAlgo = GetRunnerAlgorithm(i);
-    const char* algoNames[] = { "Random", "A*", "Seek", "Seek+" };
-    int currentAlgoIndex = static_cast<int>(currentAlgo);
-
-    ImGui::PushItemWidth(100);  // Ancho reducido de 150 a 100
-    if (ImGui::Combo("##algo", &currentAlgoIndex, algoNames, 4)) {
-      SetRunnerAlgorithm(i, static_cast<MovementAlgorithm>(currentAlgoIndex));
-    }
-    ImGui::PopItemWidth();
-
-    // OBJETIVO PERSONALIZADO
-    ImGui::Indent(25.0f);
-
-    ImGui::Text("Goal:");
-    ImGui::SameLine();
-
-    // BLOQUEO: Deshabilita inputs si el Mario no esta vivo
-    if (!canEdit) {
-      ImGui::BeginDisabled();
-    }
-
-    // Inputs para cambiar objetivo - ahora muestran las coordenadas actuales
-    int tempGoalX = runners[i].goalX;
-    int tempGoalY = runners[i].goalY;
+    int tempPosX = runners[i].x;
+    int tempPosY = runners[i].y;
 
     ImGui::PushItemWidth(40);
-    if (ImGui::InputInt("##goalX", &tempGoalX, 0, 0)) {
-      // Valida y establece cuando cambia
-      if (tempGoalX >= 0 && tempGoalX < kMapWidth && canEdit) {
-        SetRunnerGoal(i, tempGoalX, runners[i].goalY);
-      }
-    }
+    ImGui::InputInt("##posX", &tempPosX, 0, 0);
     ImGui::SameLine();
-    ImGui::Text(",");
-    ImGui::SameLine();
-    if (ImGui::InputInt("##goalY", &tempGoalY, 0, 0)) {
-      // Valida y establece cuando cambia
-      if (tempGoalY >= 0 && tempGoalY < kMapHeight && canEdit) {
-        SetRunnerGoal(i, runners[i].goalX, tempGoalY);
-      }
-    }
+    ImGui::InputInt("##posY", &tempPosY, 0, 0);
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
 
-    // Boton para resetear a meta por defecto
-    if (ImGui::Button("Reset")) {
-      if (canEdit) {
-        ResetRunnerGoal(i);
+    // Boton TP con feedback visual
+    bool isTeleportMode = (teleportMarioIndex == i);
+
+    if (isTeleportMode) {
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 1.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.7f, 0.0f, 1.0f));
+    }
+
+    //if (ImGui::Button("TP##tp")) {
+    if (ImGui::Button("Teleport Mario##tp")) {
+      if (teleportMarioIndex == i) {
+        teleportMarioIndex = -1;  // Desactivar modo TP
+      }
+      else {
+        teleportMarioIndex = i;   // Activar modo TP
+        currentBrush = BrushMode::NONE;  // Desactivar brush
+        selectedMario = -1;  // Desactivar goal selection
       }
     }
 
-    // Cierra el BeginDisabled de los inputs + Reset
-    if (!canEdit) {
-      ImGui::EndDisabled();
+    if (isTeleportMode) {
+      ImGui::PopStyleColor(3);
     }
 
     ImGui::SameLine();
@@ -404,7 +388,149 @@ void RenderImGUI(SDL_Renderer* renderer,
     if (disablePlay) {
       ImGui::EndDisabled();
     }
-    ImGui::Unindent(25.0f);
+    */
+    // Linea 3: Goal + Life + Algo
+    ImGui::Text("Goal:");
+    ImGui::SameLine();
+
+    // BLOQUEO: Deshabilita inputs si el Mario no esta vivo
+    if (!canEdit) {
+      ImGui::BeginDisabled();
+    }
+
+    // Inputs para cambiar objetivo
+    int tempGoalX = runners[i].goalX;
+    int tempGoalY = runners[i].goalY;
+
+    ImGui::PushItemWidth(40);
+    if (ImGui::InputInt("##goalX", &tempGoalX, 0, 0)) {
+      if (tempGoalX >= 0 && tempGoalX < kMapWidth && canEdit) {
+        SetRunnerGoal(i, tempGoalX, runners[i].goalY);
+      }
+    }
+    ImGui::SameLine();
+    if (ImGui::InputInt("##goalY", &tempGoalY, 0, 0)) {
+      if (tempGoalY >= 0 && tempGoalY < kMapHeight && canEdit) {
+        SetRunnerGoal(i, runners[i].goalX, tempGoalY);
+      }
+    }
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+
+    /* // Boton Reset (comentado temporalmente)
+    if (ImGui::Button("Reset")) {
+      if (canEdit) {
+        ResetRunnerGoal(i);
+      }
+    }
+    ImGui::SameLine();
+    */
+
+    // Cierra el BeginDisabled de los inputs
+    if (!canEdit) {
+      ImGui::EndDisabled();
+    }
+
+    ImGui::SameLine();
+
+    // Tiempos
+    ImGui::Text("Life: %.2fs  Algo: %.2fs", runners[i].lifeTime, runners[i].currentAlgoTime);
+
+    //ImGui::Unindent(25.0f);
+
+
+
+    // Linea 2: Pos + TP + Stop + Play
+    //ImGui::Indent(25.0f);
+
+    ImGui::Text("Pos:");
+    ImGui::SameLine();
+
+    int tempPosX = runners[i].x;
+    int tempPosY = runners[i].y;
+
+    ImGui::PushItemWidth(40);
+    ImGui::InputInt("##posX", &tempPosX, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##posY", &tempPosY, 0, 0);
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+
+    // Boton TP con feedback visual
+    bool isTeleportMode = (teleportMarioIndex == i);
+
+    if (isTeleportMode) {
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 1.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.7f, 0.0f, 1.0f));
+    }
+
+    //if (ImGui::Button("TP##tp")) {
+    if (ImGui::Button("Teleport Mario##tp")) {
+      if (teleportMarioIndex == i) {
+        teleportMarioIndex = -1;  // Desactivar modo TP
+      }
+      else {
+        teleportMarioIndex = i;   // Activar modo TP
+        currentBrush = BrushMode::NONE;  // Desactivar brush
+        selectedMario = -1;  // Desactivar goal selection
+      }
+    }
+
+    if (isTeleportMode) {
+      ImGui::PopStyleColor(3);
+    }
+
+    ImGui::SameLine();
+
+    // Boton STOP - Solo activo si esta vivo y NO pausado
+    bool isRunnerPaused = IsRunnerPaused(i);
+    bool disableStop = !canEdit || isRunnerPaused;
+
+    if (disableStop) {
+      ImGui::BeginDisabled();
+    }
+    if (ImGui::Button("Stop##stop")) {
+      SetRunnerPaused(i, true);
+    }
+    if (disableStop) {
+      ImGui::EndDisabled();
+    }
+
+    ImGui::SameLine();
+
+    // Boton PLAY - Solo activo si esta vivo y pausado
+    bool disablePlay = !canEdit || !isRunnerPaused;
+
+    if (disablePlay) {
+      ImGui::BeginDisabled();
+    }
+    if (ImGui::Button("Play##play")) {
+      SetRunnerPaused(i, false);
+    }
+    if (disablePlay) {
+      ImGui::EndDisabled();
+    }
+
+    ImGui::EndGroup();
+
+    ImGui::SameLine();
+
+    // SELECTOR DE ALGORITMO (mas pequeño)
+    float availWidth = ImGui::GetContentRegionAvail().x;
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availWidth - 100));
+
+    MovementAlgorithm currentAlgo = GetRunnerAlgorithm(i);
+    const char* algoNames[] = { "Random", "A*", "Seek", "Seek+" };
+    int currentAlgoIndex = static_cast<int>(currentAlgo);
+
+    ImGui::PushItemWidth(100);
+    if (ImGui::Combo("##algo", &currentAlgoIndex, algoNames, 4)) {
+      SetRunnerAlgorithm(i, static_cast<MovementAlgorithm>(currentAlgoIndex));
+    }
+    ImGui::PopItemWidth();
 
     ImGui::Separator();
     ImGui::PopID();
@@ -415,7 +541,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   // ==========================================
   // PANEL DERECHO INFERIOR - Game Control
   // ==========================================
-  PositionSizeImGUI(rightPanelX, 570, kUIRightWidth, kWindowHeight - 570);
+  PositionSizeImGUI(rightPanelX, 640, kUIRightWidth, kWindowHeight - 640);
 
   ImGui::Begin("Game Control");
 
@@ -426,16 +552,17 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::TextWrapped("Reset map and respawn all Marios at spawn points with initial goals.");
 
   ImGui::Spacing();
-  ImGui::Spacing();
+  //ImGui::Spacing();
 
   // Boton grande de restart
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.4f, 1.0f, 0.4f, 1.0f));
-  if (ImGui::Button("RESTART GAME", ImVec2(380, 80))) {
+  if (ImGui::Button("RESTART GAME", ImVec2(335, 20))) {
     RestartGame();
     currentBrush = BrushMode::NONE;  // Deselecciona brush
     selectedMario = -1;  // Deselecciona Mario
+    teleportMarioIndex = -1;  // Desactiva modo teleport
   }
   ImGui::PopStyleColor(3);
 

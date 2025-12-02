@@ -78,3 +78,6 @@ void SetRunnerPaused(int runnerIndex, bool paused);
 
 // Verifica si un runner esta pausado
 bool IsRunnerPaused(int runnerIndex);
+
+// Teleporta un runner a una posicion especifica
+void TeleportRunner(int runnerIndex, int x, int y);

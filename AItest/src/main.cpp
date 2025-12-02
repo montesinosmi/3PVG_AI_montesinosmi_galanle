@@ -26,6 +26,9 @@ int selectedMario = -1;
 // Variable global para el brush del editor de mapa
 BrushMode currentBrush = BrushMode::NONE;
 
+// Variable global para el Mario en modo teleport (-1 = ninguno)
+int teleportMarioIndex = -1;
+
 int main(int argc, char* argv[]) {
   srand(time(NULL));
 
@@ -72,8 +75,13 @@ int main(int argc, char* argv[]) {
           // Valida que las coordenadas esten dentro del mapa
           if (gridX >= 0 && gridX < kMapWidth && gridY >= 0 && gridY < kMapHeight) {
 
-            // PRIORIDAD 1: Editor de mapa (si hay brush seleccionado)
-            if (currentBrush != BrushMode::NONE) {
+            // PRIORIDAD 1: Modo Teleport activo
+            if (teleportMarioIndex >= 0 && teleportMarioIndex < kRunnerQuantity) {
+              TeleportRunner(teleportMarioIndex, gridX, gridY);
+              teleportMarioIndex = -1;  // Desactivar modo teleport
+            }
+            // PRIORIDAD 2: Editor de mapa (si hay brush seleccionado)
+            else if (currentBrush != BrushMode::NONE) {
               int type = static_cast<int>(currentBrush);
               bool transitable = true;
 
@@ -85,7 +93,7 @@ int main(int argc, char* argv[]) {
 
               SetCellType(gridX, gridY, type, transitable);
             }
-            // PRIORIDAD 2: Establecer objetivo de Mario (si hay Mario seleccionado)
+            // PRIORIDAD 3: Establecer objetivo de Mario (si hay Mario seleccionado)
             else if (selectedMario >= 0 && selectedMario < kRunnerQuantity) {
               // Solo permite cambiar objetivo si esta VIVO (state == 1)
               if (runners[selectedMario].state == 1) {
@@ -109,7 +117,7 @@ int main(int argc, char* argv[]) {
     DrawGoalFlags(renderer);  // Dibuja banderas ANTES de los runners para que aparezcan debajo
     DrawRunners(renderer);
     RenderImGUI(renderer, WorldTimer, RunnerTimer, CurrentWorldTime, CurrentRunnerTime,
-      selectedMario, currentBrush);
+      selectedMario, currentBrush, teleportMarioIndex);
 
     SDL_RenderPresent(renderer);
     SDL_Delay(10);
