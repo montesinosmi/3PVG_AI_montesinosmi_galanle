@@ -149,6 +149,29 @@ static bool IsWalkable(int x, int y)
   return (slabs[y][x].type != 0 && slabs[y][x].transitable);
 }
 
+// Random objetivo
+static void AssignRandomGoalToRunner(Runner& r)
+{
+  const int maxTries = 10;	// limite de seguridad
+  for (int i = 0; i < maxTries; ++i) {
+    int x = rand() % kMapWidth;
+    int y = rand() % kMapHeight;
+    // Evitamos la casilla del Mario y las no transitables
+    if ((x == r.x && y == r.y) /* || !IsWalkable(x, y)*/) {
+      continue;
+    }
+
+    r.goalX = x;
+    r.goalY = y;
+
+    // Reseteamos path para A* por si acaso
+    r.pathLength = 0;
+    r.pathIndex = 0;
+    return;
+  }
+}
+
+
 // Mueve al runner a (nx, ny) si es walkable, actualiza direccion y goal
 static bool MoveRunnerTo(Runner& r, int nx, int ny)
 {
@@ -429,8 +452,103 @@ static void UpdateRunnerSeekDumb(Runner& r)
     UpdateRunnerRandom(r);
   }
 }
+
+// Si flee == false -< SeekSmart (Mario se acerca al goal)
+// Si flee == true  -> Flee (Mario huye del goal)
+static void UpdateRunnerSeekLike(Runner& r, bool flee)
+{
+  if (r.goalX == -1 || r.goalY == -1) {
+    UpdateRunnerRandom(r);
+    return;
+  }
+
+  int currentDist = abs(r.x - r.goalX) + abs(r.y - r.goalY);
+
+  const int dx[4] = { 0,  0, -1, 1 };
+  const int dy[4] = { -1, 1,  0, 0 };
+
+  // Primera pasada: sin reversa
+  int bestX = r.x;
+  int bestY = r.y;
+  int bestDist = currentDist;
+  bool foundBetterNoReverse = false;
+
+  for (int i = 0; i < 4; ++i) {
+    int nx = r.x + dx[i];
+    int ny = r.y + dy[i];
+
+    if (!IsWalkable(nx, ny))
+      continue;
+
+    bool isReverse = (nx == r.lastX && ny == r.lastY);
+
+    int dist = abs(nx - r.goalX) + abs(ny - r.goalY);
+
+    if (!isReverse) {
+      if (!flee && dist < bestDist) {          // SEEK+: queremos MAS cerca
+        bestDist = dist;
+        bestX = nx;
+        bestY = ny;
+        foundBetterNoReverse = true;
+      }
+      else if (flee && dist > bestDist) {      // FLEE: queremos MAS lejos
+        bestDist = dist;
+        bestX = nx;
+        bestY = ny;
+        foundBetterNoReverse = true;
+      }
+    }
+  }
+
+  if (foundBetterNoReverse) {
+    MoveRunnerTo(r, bestX, bestY);
+    return;
+  }
+
+  // Segunda pasada: aceptamos reversa / empates
+  bestX = r.x;
+  bestY = r.y;
+  bestDist = currentDist;
+  bool foundAny = false;
+
+  for (int i = 0; i < 4; ++i) {
+    int nx = r.x + dx[i];
+    int ny = r.y + dy[i];
+
+    if (!IsWalkable(nx, ny))
+      continue;
+
+    int dist = abs(nx - r.goalX) + abs(ny - r.goalY);
+
+    bool betterOrEqual = false;
+    if (!flee) {
+      betterOrEqual = (dist <= bestDist);      // SEEK+: igual o mas cerca
+    }
+    else {
+      betterOrEqual = (dist >= bestDist);      // FLEE: igual o mas lejos
+    }
+
+    if (betterOrEqual) {
+      bestDist = dist;
+      bestX = nx;
+      bestY = ny;
+      foundAny = true;
+    }
+  }
+
+  if (foundAny && (bestX != r.x || bestY != r.y)) {
+    MoveRunnerTo(r, bestX, bestY);
+  }
+  else {
+    // Si no hay nada razonable, fallback a random
+    UpdateRunnerRandom(r);
+  }
+}
+
+
+
 // SEEK LISTO: evita ir hacia la casilla anterior si puede
-static void UpdateRunnerSeekSmart(Runner& r)
+/*static void UpdateRunnerSeekSmart(Runner& r)
 {
   if (r.goalX == -1 || r.goalY == -1) {
     UpdateRunnerRandom(r);
@@ -503,6 +621,17 @@ static void UpdateRunnerSeekSmart(Runner& r)
     // Si aun asi no hay nada razonable, se comporta como random
     UpdateRunnerRandom(r);
   }
+}*/
+
+
+void UpdateRunnerSeekSmart(Runner& r)
+{
+  UpdateRunnerSeekLike(r, false); // acercarse al goal
+}
+
+void UpdateRunnerFlee(Runner& r)
+{
+  UpdateRunnerSeekLike(r, true);  // huir del goal
 }
 
 
@@ -520,67 +649,69 @@ void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer)
 
   if (currentRunnerTime >= runnerTimer) {
     for (int i = 0; i < kRunnerQuantity; i++) {
-      //if (runners[i].state == 1) {
-        if (runners[i].state == 1 && !runners[i].isPaused) {
+      if (runners[i].state == 1 && !runners[i].isPaused) {
 
-          switch (runners[i].algorithm) {
+        switch (runners[i].algorithm) {
 
-          case MovementAlgorithm::A_STAR:
-          {
-            // codigo A*
-            if (runners[i].pathLength == 0 || runners[i].pathIndex >= runners[i].pathLength) {
-              CalculateAStarPath(runners[i]);
-            }
-
-            if (runners[i].pathIndex < runners[i].pathLength) {
-              int nextX = runners[i].pathX[runners[i].pathIndex];
-              int nextY = runners[i].pathY[runners[i].pathIndex];
-
-              if (slabs[nextY][nextX].transitable && slabs[nextY][nextX].type != 0) {
-
-                runners[i].lastX = runners[i].x;
-                runners[i].lastY = runners[i].y;
-
-                runners[i].x = nextX;
-                runners[i].y = nextY;
-
-                if (runners[i].pathIndex > 0) {
-                  if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
-                    runners[i].direction = 2; // Izquierda
-                  }
-                  else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
-                    runners[i].direction = 3; // Derecha
-                  }
-                }
-
-                runners[i].pathIndex++;
-
-                if (nextX == runners[i].goalX && nextY == runners[i].goalY) {
-                  runners[i].state = 2; // Victoria
-                }
-              }
-              else {
-                runners[i].pathLength = 0;
-              }
-            }
+        case MovementAlgorithm::A_STAR:
+        {
+          // codigo A*
+          if (runners[i].pathLength == 0 || runners[i].pathIndex >= runners[i].pathLength) {
+            CalculateAStarPath(runners[i]);
           }
-          break;
 
-          case MovementAlgorithm::RANDOM:
-            UpdateRunnerRandom(runners[i]);
-            break;
+          if (runners[i].pathIndex < runners[i].pathLength) {
+            int nextX = runners[i].pathX[runners[i].pathIndex];
+            int nextY = runners[i].pathY[runners[i].pathIndex];
 
-          case MovementAlgorithm::SEEK_DUMB:
-            UpdateRunnerSeekDumb(runners[i]);
-            break;
+            if (slabs[nextY][nextX].transitable && slabs[nextY][nextX].type != 0) {
 
-          case MovementAlgorithm::SEEK_SMART:
-            UpdateRunnerSeekSmart(runners[i]);
-            break;
+              runners[i].lastX = runners[i].x;
+              runners[i].lastY = runners[i].y;
+
+              runners[i].x = nextX;
+              runners[i].y = nextY;
+
+              if (runners[i].pathIndex > 0) {
+                if (nextX < runners[i].pathX[runners[i].pathIndex - 1]) {
+                  runners[i].direction = 2; // Izquierda
+                }
+                else if (nextX > runners[i].pathX[runners[i].pathIndex - 1]) {
+                  runners[i].direction = 3; // Derecha
+                }
+              }
+
+              runners[i].pathIndex++;
+
+              if (nextX == runners[i].goalX && nextY == runners[i].goalY) {
+                runners[i].state = 2; // Victoria
+              }
+            }
+            else {
+              runners[i].pathLength = 0;
+            }
           }
         }
+        break;
 
-      //}
+        case MovementAlgorithm::RANDOM:
+          UpdateRunnerRandom(runners[i]);
+          break;
+
+        case MovementAlgorithm::SEEK_DUMB:
+          UpdateRunnerSeekDumb(runners[i]);
+          break;
+
+        case MovementAlgorithm::SEEK_SMART:
+				case MovementAlgorithm::SCATTER:
+          UpdateRunnerSeekSmart(runners[i]);
+          break;
+
+        case MovementAlgorithm::FLEE:
+          UpdateRunnerFlee(runners[i]);
+          break;
+        }
+      }
     }
     currentRunnerTime = 0.0f;
   }
@@ -612,8 +743,12 @@ void SetRunnerAlgorithm(int runnerIndex, MovementAlgorithm algorithm) {
     if (runners[runnerIndex].algorithm != algorithm) {
       runners[runnerIndex].currentAlgoTime = 0.0f;
     }
+		if (algorithm == MovementAlgorithm::SCATTER) {
+			// Asigna un objetivo aleatorio al cambiar a SCATTER
+			AssignRandomGoalToRunner(runners[runnerIndex]);
+		}
     runners[runnerIndex].algorithm = algorithm;
-    runners[runnerIndex].pathLength = 0;
+    runners[runnerIndex].pathLength = 0;  // Reset path por si venia de A* o lo usamos despues
     runners[runnerIndex].pathIndex = 0;
   }
 }
