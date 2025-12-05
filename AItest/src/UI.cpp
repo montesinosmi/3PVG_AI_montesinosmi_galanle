@@ -68,7 +68,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   // ==========================================
   // PANEL IZQUIERDO MEDIO - Map Editor
   // ==========================================
-  PositionSizeImGUI(0, 240, kUILeftWidth, kWindowHeight - 400);
+  PositionSizeImGUI(0, 240, kUILeftWidth, kWindowHeight - 420);
 
   ImGui::Begin("Map Editor");
 
@@ -177,7 +177,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   // Boton de reset del mapa
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
-  if (ImGui::Button("RESET MAP", ImVec2(335, 45))) {
+  if (ImGui::Button("RESET MAP", ImVec2(335, 30))) {
     ResetMap();
     currentBrush = BrushMode::NONE;  // Deselecciona brush al resetear
     teleportMarioIndex = -1;  // Desactiva modo teleport
@@ -186,34 +186,38 @@ void RenderImGUI(SDL_Renderer* renderer,
 
   ImGui::End();
 
+  // =========================================
+  // PANEL IZQUIERDO INFERIOR - Game Control 
   // ==========================================
-  // PANEL IZQUIERDO INFERIOR - Info
-  // ==========================================
-  PositionSizeImGUI(0, kWindowHeight - 160, kUILeftWidth, 160);
+  PositionSizeImGUI(0, kWindowHeight - 180, kUILeftWidth, 180);
 
-  ImGui::Begin("Info");
+  ImGui::Begin("Game Control");
 
-  ImGui::Text("Map: %dx%d cells", kMapWidth, kMapHeight);
-  ImGui::Text("Window: %dx%d px", kWindowWidth, kWindowHeight);
-  ImGui::Text("Cell: %.0fpx (x%.1f)", kTexSize * kScale, kScale);
-
-  ImGui::Spacing();
+  ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "RESTART GAME:");
   ImGui::Separator();
   ImGui::Spacing();
 
-  // Estadisticas de pathfinding en tiempo real
-  int pathsActive = 0;
-  for (int i = 0; i < kRunnerQuantity; i++) {
-    if (runners[i].state == 1 && runners[i].pathLength > 0) {
-      pathsActive++;
-    }
+  ImGui::TextWrapped("Reset map and respawn all Marios at spawn points with initial goals.");
+
+  ImGui::Spacing();
+
+  // Boton grande de restart
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f));
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.4f, 1.0f, 0.4f, 1.0f));
+  if (ImGui::Button("RESTART GAME", ImVec2(335, 30))) {
+    RestartGame();
+    currentBrush = BrushMode::NONE;  // Deselecciona brush
+    selectedMario = -1;  // Deselecciona Mario
+    teleportMarioIndex = -1;  // Desactiva modo teleport
   }
-  ImGui::Text("Active A* paths: %d/%d", pathsActive, GetStateMarios(1));
+  ImGui::PopStyleColor(3);
 
   ImGui::Spacing();
   ImGui::Separator();
   ImGui::Spacing();
 
+  // Info del proyecto
   ImGui::TextWrapped("Programmers: Alvaro G. & Pablo M.");
   ImGui::Spacing();
   ImGui::TextWrapped("Professor: Gustavo Aranda");
@@ -221,10 +225,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::End();
 
   // ==========================================
-  // PANEL DERECHO SUPERIOR - Mario Selector
+  // PANEL DERECHO - Mario Selector 
   // ==========================================
   float rightPanelX = kMapOffsetX + kMapPixelWidth;
-  PositionSizeImGUI(rightPanelX, 0, kUIRightWidth, 640);
+  PositionSizeImGUI(rightPanelX, 0, kUIRightWidth, kWindowHeight);
 
   ImGui::Begin("Mario Selector");
 
@@ -261,6 +265,7 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::Separator();
   ImGui::Spacing();
 
+  // CONTROLES INDIVIDUALES DE CADA MARIO
   for (int i = 0; i < kRunnerQuantity; i++) {
     ImGui::PushID(i);
     ImGui::BeginGroup();
@@ -306,89 +311,13 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     ImGui::SameLine();
 
-    // INFORMACION DE ESTADO Y TIEMPOS 
-    //ImGui::BeginGroup();
-
     // Linea 1: Estado
     const char* stateText = "???";
     if (runners[i].state == 0) stateText = "DEAD";
     else if (runners[i].state == 1) stateText = "ALIVE";
     else if (runners[i].state == 2) stateText = "SAFE";
     ImGui::Text("Mario %d [%s]", i + 1, stateText);
-    /*
-    // Linea 2: Pos + TP + Stop + Play
-    //ImGui::Indent(25.0f);
 
-    ImGui::Text("Pos:");
-    ImGui::SameLine();
-
-    int tempPosX = runners[i].x;
-    int tempPosY = runners[i].y;
-
-    ImGui::PushItemWidth(40);
-    ImGui::InputInt("##posX", &tempPosX, 0, 0);
-    ImGui::SameLine();
-    ImGui::InputInt("##posY", &tempPosY, 0, 0);
-    ImGui::PopItemWidth();
-
-    ImGui::SameLine();
-
-    // Boton TP con feedback visual
-    bool isTeleportMode = (teleportMarioIndex == i);
-
-    if (isTeleportMode) {
-      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 1.0f));
-      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-      ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.7f, 0.0f, 1.0f));
-    }
-
-    //if (ImGui::Button("TP##tp")) {
-    if (ImGui::Button("Teleport Mario##tp")) {
-      if (teleportMarioIndex == i) {
-        teleportMarioIndex = -1;  // Desactivar modo TP
-      }
-      else {
-        teleportMarioIndex = i;   // Activar modo TP
-        currentBrush = BrushMode::NONE;  // Desactivar brush
-        selectedMario = -1;  // Desactivar goal selection
-      }
-    }
-
-    if (isTeleportMode) {
-      ImGui::PopStyleColor(3);
-    }
-
-    ImGui::SameLine();
-
-    // Boton STOP - Solo activo si esta vivo y NO pausado
-    bool isRunnerPaused = IsRunnerPaused(i);
-    bool disableStop = !canEdit || isRunnerPaused;
-
-    if (disableStop) {
-      ImGui::BeginDisabled();
-    }
-    if (ImGui::Button("Stop##stop")) {
-      SetRunnerPaused(i, true);
-    }
-    if (disableStop) {
-      ImGui::EndDisabled();
-    }
-
-    ImGui::SameLine();
-
-    // Boton PLAY - Solo activo si esta vivo y pausado
-    bool disablePlay = !canEdit || !isRunnerPaused;
-
-    if (disablePlay) {
-      ImGui::BeginDisabled();
-    }
-    if (ImGui::Button("Play##play")) {
-      SetRunnerPaused(i, false);
-    }
-    if (disablePlay) {
-      ImGui::EndDisabled();
-    }
-    */
     // Linea 3: Goal + Life + Algo
     ImGui::Text("Goal:");
     ImGui::SameLine();
@@ -418,15 +347,6 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     ImGui::SameLine();
 
-    /* // Boton Reset (comentado temporalmente)
-    if (ImGui::Button("Reset")) {
-      if (canEdit) {
-        ResetRunnerGoal(i);
-      }
-    }
-    ImGui::SameLine();
-    */
-
     // Cierra el BeginDisabled de los inputs
     if (!canEdit) {
       ImGui::EndDisabled();
@@ -437,13 +357,7 @@ void RenderImGUI(SDL_Renderer* renderer,
     // Tiempos
     ImGui::Text("Life: %.2fs  Algo: %.2fs", runners[i].lifeTime, runners[i].currentAlgoTime);
 
-    //ImGui::Unindent(25.0f);
-
-
-
-    // Linea 2: Pos + TP + Stop + Play
-    //ImGui::Indent(25.0f);
-
+    // Linea 2, Pos + TP + Stop + Play
     ImGui::Text("Pos:");
     ImGui::SameLine();
 
@@ -467,7 +381,6 @@ void RenderImGUI(SDL_Renderer* renderer,
       ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.7f, 0.0f, 1.0f));
     }
 
-    //if (ImGui::Button("TP##tp")) {
     if (ImGui::Button("Teleport Mario##tp")) {
       if (teleportMarioIndex == i) {
         teleportMarioIndex = -1;  // Desactivar modo TP
@@ -518,7 +431,7 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     ImGui::SameLine();
 
-    // SELECTOR DE ALGORITMO (mas pequeño)
+    // SELECTOR DE ALGORITMO (mas peque)
     float availWidth = ImGui::GetContentRegionAvail().x;
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availWidth - 100));
 
@@ -536,35 +449,65 @@ void RenderImGUI(SDL_Renderer* renderer,
     ImGui::PopID();
   }
 
-  ImGui::End();
-
   // ==========================================
-  // PANEL DERECHO INFERIOR - Game Control
+  // CONTROLES GLOBALES
   // ==========================================
-  PositionSizeImGUI(rightPanelX, 640, kUIRightWidth, kWindowHeight - 640);
-
-  ImGui::Begin("Game Control");
-
-  ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "RESTART GAME:");
+  //ImGui::Spacing();
+  //ImGui::Spacing();
+  ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "=== GLOBAL CONTROLS ===");
   ImGui::Separator();
   ImGui::Spacing();
 
-  ImGui::TextWrapped("Reset map and respawn all Marios at spawn points with initial goals.");
+  // Contador de Marios vivos
+  int aliveMarios = GetStateMarios(1);
+  ImGui::Text("Control all alive Marios (%d)", aliveMarios);
+  ImGui::Spacing();
+
+  // Selector de algoritmo global
+  static int globalAlgoIndex = 0;
+  const char* algoNames[] = { "Random", "A*", "Seek", "Seek+", "Scatter", "Flee" };
+
+  ImGui::Text("Algorithm:");
+  ImGui::SameLine();
+  ImGui::PushItemWidth(120);
+  if (ImGui::Combo("##globalAlgo", &globalAlgoIndex, algoNames, 6)) {
+    // Aplicar el algoritmo a todos los Marios VIVOS
+    for (int i = 0; i < kRunnerQuantity; i++) {
+      if (runners[i].state == 1) {  // Solo a los vivos
+        SetRunnerAlgorithm(i, static_cast<MovementAlgorithm>(globalAlgoIndex));
+      }
+    }
+  }
+  ImGui::PopItemWidth();
 
   ImGui::Spacing();
-  //ImGui::Spacing();
 
-  // Boton grande de restart
+  // Botones de Stop y Play globales
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
+  if (ImGui::Button("STOP ALL", ImVec2(160, 30))) {
+    // Parar todos los Marios vivos
+    for (int i = 0; i < kRunnerQuantity; i++) {
+      if (runners[i].state == 1) {  // Solo a los vivos
+        SetRunnerPaused(i, true);
+      }
+    }
+  }
+  ImGui::PopStyleColor(2);
+
+  ImGui::SameLine();
+
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f));
   ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f));
-  ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.4f, 1.0f, 0.4f, 1.0f));
-  if (ImGui::Button("RESTART GAME", ImVec2(335, 20))) {
-    RestartGame();
-    currentBrush = BrushMode::NONE;  // Deselecciona brush
-    selectedMario = -1;  // Deselecciona Mario
-    teleportMarioIndex = -1;  // Desactiva modo teleport
+  if (ImGui::Button("PLAY ALL", ImVec2(160, 30))) {
+    // Reanudar todos los Marios vivos
+    for (int i = 0; i < kRunnerQuantity; i++) {
+      if (runners[i].state == 1) {  // Solo a los vivos
+        SetRunnerPaused(i, false);
+      }
+    }
   }
-  ImGui::PopStyleColor(3);
+  ImGui::PopStyleColor(2);
 
   ImGui::End();
 
