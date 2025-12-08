@@ -93,8 +93,10 @@ void InitRunners() {
 void DrawRunners(SDL_Renderer* renderer) {
   for (int i = 0; i < kRunnerQuantity; i++) {
     // Aplica offset X para que los runners se dibujen en el mapa desplazado
-    int posX = kMapOffsetX + (runners[i].x * kTexSize * kScale);
-    int posY = runners[i].y * kTexSize * kScale;
+    /*int posX = kMapOffsetX + (runners[i].x * kTexSize * kScale);
+    int posY = runners[i].y * kTexSize * kScale;*/
+    int posX = kMapOffsetX + static_cast<int>(runners[i].x * kTexSize * kScale);
+    int posY = static_cast<int>(runners[i].y * kTexSize * kScale);
 
     switch (runners[i].state) {
     case 0:  // Muerto
@@ -127,8 +129,10 @@ void DrawGoalFlags(SDL_Renderer* renderer) {
     // Solo dibuja bandera si el Mario esta VIVO (no muerto, no llego a meta)
     if (runners[i].goalX != -1 && runners[i].goalY != -1 && runners[i].state == 1) {
       // Aplica offset X para que las banderas se dibujen en el mapa desplazado
-      int posX = kMapOffsetX + (runners[i].goalX * kTexSize * kScale);
-      int posY = runners[i].goalY * kTexSize * kScale;
+      /*int posX = kMapOffsetX + (runners[i].goalX * kTexSize * kScale);
+      int posY = runners[i].goalY * kTexSize * kScale;*/
+      int posX = kMapOffsetX + static_cast<int>(runners[i].goalX * kTexSize * kScale);
+      int posY = static_cast<int>(runners[i].goalY * kTexSize * kScale);
 
       DrawCell(renderer, finishtex, posX, posY,
         runners[i].r, runners[i].g, runners[i].b);
@@ -188,7 +192,7 @@ static bool MoveRunnerTo(Runner& r, int nx, int ny)
   r.x = nx;
   r.y = ny;
 
-  // ¿ha llegado a su objetivo?
+  // ha llegado a su objetivo?
   if (r.goalX != -1 && r.goalY != -1 &&
     r.x == r.goalX && r.y == r.goalY)
   {

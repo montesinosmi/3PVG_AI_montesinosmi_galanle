@@ -80,8 +80,10 @@ void DrawMaze(SDL_Renderer* renderer) {
   for (int i = 0; i < kMapHeight; i++) {
     for (int j = 0; j < kMapWidth; j++) {
       // Aplica offset X para centrar el mapa despues del UI izquierdo
-      int posX = kMapOffsetX + (j * kTexSize * kScale);
-      int posY = i * kTexSize * kScale;
+      /*int posX = kMapOffsetX + (j * kTexSize * kScale);
+      int posY = i * kTexSize * kScale;*/
+      int posX = kMapOffsetX + static_cast<int>(j * kTexSize * kScale);
+      int posY = static_cast<int>(i * kTexSize * kScale);
 
       switch (slabs[i][j].type) {
       case 0:

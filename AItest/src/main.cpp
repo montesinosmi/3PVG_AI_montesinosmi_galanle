@@ -30,7 +30,8 @@ BrushMode currentBrush = BrushMode::NONE;
 int teleportMarioIndex = -1;
 
 int main(int argc, char* argv[]) {
-  srand(time(NULL));
+  //srand(time(NULL));
+  srand(static_cast<unsigned int>(time(NULL)));
 
   // Inicializacion
   if (!Renderer_Create("AI", kWindowWidth, kWindowHeight, &window, &renderer)) {
@@ -69,8 +70,10 @@ int main(int argc, char* argv[]) {
           int mapRelativeY = mouseY;
 
           // Convierte coordenadas de pantalla a coordenadas del grid
-          int gridX = mapRelativeX / (kTexSize * kScale);
-          int gridY = mapRelativeY / (kTexSize * kScale);
+          /*int gridX = mapRelativeX / (kTexSize * kScale);
+          int gridY = mapRelativeY / (kTexSize * kScale);*/
+          int gridX = static_cast<int>(mapRelativeX / (kTexSize * kScale)); // asi es mas seguro
+          int gridY = static_cast<int>(mapRelativeY / (kTexSize * kScale));
 
           // Valida que las coordenadas esten dentro del mapa
           if (gridX >= 0 && gridX < kMapWidth && gridY >= 0 && gridY < kMapHeight) {
@@ -125,7 +128,8 @@ int main(int argc, char* argv[]) {
     // Actualiza delta time
     Uint32 currentTime = SDL_GetTicks();
     DeltaTime = currentTime - LastTime;
-    LastTime = currentTime;
+    //LastTime = currentTime;
+    LastTime = static_cast<float>(currentTime);
   }
 
   // Limpieza
