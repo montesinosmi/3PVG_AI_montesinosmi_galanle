@@ -1,42 +1,36 @@
-INSTRUCCIONES PARA GENERAR EL PROYECTO (PREMAKE + VISUAL STUDIO)
+============================================================
+GUÍA DE GENERACIÓN DE PROYECTO (VISUAL STUDIO + PREMAKE)
+============================================================
 
-1) Requisitos
-   - Tener Visual Studio 2022 instalado (con soporte C++).
-   - Tener este repositorio clonado completo (assets, src, deps, etc.).
+1. REQUISITOS PREVIOS
+---------------------
+- Tener Visual Studio 2022 instalado (con soporte para C++).
+- Tener el repositorio clonado con todas sus carpetas (assets, src, deps).
 
-2) Archivos importantes
-   - premake5.exe está en:   tools/premake5.exe
-   - premake5.lua está en:   premake5.lua (en la carpeta raíz del proyecto)
+2. CONFIGURACIÓN DE PREMAKE (IMPORTANTE)
+----------------------------------------
+El ejecutable "premake5.exe" NO se incluye en el repositorio.
+1. Descargar Premake 5 desde: https://premake.github.io/download/
+   (Descargar la versión de Windows).
+2. Descomprimir el archivo ZIP.
+3. Copiar el archivo "premake5.exe" dentro de la carpeta "tools/" de este proyecto.
 
-3) Cómo generar la solución de Visual Studio
+3. GENERAR LA SOLUCIÓN .SLN
+---------------------------
+1. Abrir una consola (CMD o PowerShell).
+2. Navegar a la CARPETA RAÍZ del proyecto.
+   (IMPORTANTE: Quedarse en la raíz, NO entrar en la carpeta tools).
+3. Ejecutar el siguiente comando:
+   tools\premake5.exe vs2022
 
-   3.1. Abrir una consola
-        - Puedes usar "x64 Native Tools Command Prompt for VS 2022"
-          o una consola normal (CMD / PowerShell).
+4. COMPILAR Y EJECUTAR
+----------------------
+1. Ir a la carpeta "build/" que se acaba de crear.
+2. Abrir el archivo "AItest.sln" con Visual Studio.
+3. Seleccionar la configuración "Debug".
+4. Compilar (Ctrl+Shift+B).
+5. Ejecutar (F5).
 
-   3.2. Ir a la carpeta raíz del proyecto (IMPORTANTE: NO entrar en tools)
-        Ejemplo:
-        cd C:\Users\TU_USUARIO\Documents\GitHub\3PVG_AI_montesinosmi_galanle\Altest
-
-   3.3. Ejecutar Premake desde la raíz:
-        tools\premake5.exe vs2022
-
-        (Si dice "No Premake script found", es que no estás en la raíz correcta.)
-
-   3.4. Después de ejecutar, se genera la solución en:
-        build\AItest.sln
-
-4) Abrir el proyecto
-   - Abrir con Visual Studio el archivo:
-     build\AItest.sln
-
-   - Seleccionar configuración "Debug" y compilar (Ctrl+Shift+B).
-   - Ejecutar con F5.
-
-5) Notas
-   - El ejecutable se genera en: bin\Debug\AItest.exe
-   - Las DLL de SDL2 deben estar ya en:
-       bin\Debug\SDL2.dll
-       bin\Debug\SDL2_image.dll
-       bin\Release\SDL2.dll
-       bin\Release\SDL2_image.dll
+NOTAS:
+- El ejecutable final estará en: bin\Debug\AItest.exe
+- Las DLLs necesarias se copiarán automáticamente.

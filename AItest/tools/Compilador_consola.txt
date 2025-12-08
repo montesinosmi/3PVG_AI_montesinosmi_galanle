@@ -1,67 +1,42 @@
-// README_build_bats.hpp
-// Breve guía bilingüe sobre cómo compilar y qué hace cada .bat
-// (Español primero, luego Inglés). Copia y pega este header si quieres
-// tener la referencia dentro de tu proyecto.
-
-static const char* README_BUILD_BATS = R"(
-
 ============================================================
-ESPAÑOL — Cómo compilar y qué hace cada .bat
+GUÍA DE COMPILACIÓN POR CONSOLA (SCRIPTS .BAT)
 ============================================================
 
-Con qué compilar
-----------------
-\t• Abre: "x64 Native Tools Command Prompt for Visual Studio" (MSVC x64).
-\t• Ve a la carpeta: tools\ de tu proyecto.
+HERRAMIENTA NECESARIA
+---------------------
+- Utilizar siempre: "x64 Native Tools Command Prompt for Visual Studio".
+- Ubicación de ejecución: Carpeta "tools/" del proyecto.
 
-Flujo de comp.bat
------------------
-\t1) Pregunta: "¿Limpiar antes? [S/N]" 
-\t\t• S  → ejecuta clear.bat (o la variante completa si así lo implementaste).
-\t\t• N  → salta la limpieza.
-\t2) Compila con MSVC:
-\t\t• Genera bin\AItest.exe.
-\t\t• Copia SDL2.dll y SDL2_image.dll a bin\ (si procede).
-\t3) Si falla:
-\t\t• Revisa bin\compile_log.txt (si el script lo genera).
-\t4) Pregunta: "¿Ejecutar AItest.exe ahora? [S/N]"
-\t\t• S  → lanza bin\AItest.exe.
-\t\t• N  → termina sin ejecutar.
+FLUJO PRINCIPAL (comp.bat)
+--------------------------
+El script "comp.bat" automatiza todo el proceso. Al ejecutarlo:
 
-Qué hace cada .bat
-------------------
-\t• comp.bat
-\t\t- Orquesta todo el flujo: (opcional) limpiar → compilar → (opcional) ejecutar.
-\t\t- Copia DLLs necesarias y muestra logs en caso de error.
-\t• compile.bat
-\t\t- Solo compila; produce bin\AItest.exe y copia DLLs.
-\t\t- No pregunta ni ejecuta el juego.
-\t• clear.bat
-\t\t- Limpia artefactos (exe, obj, pdb, ilk, logs) en bin\, build\, tools\.
-\t\t- Con parámetro "all" puede eliminar también DLLs de bin\.
+1. Pregunta: "¿Limpiar antes? [S/N]"
+   - S: Ejecuta limpieza de archivos temporales y antiguos.
+   - N: Mantiene los archivos anteriores (compilación más rápida).
 
-Notas
------
-\t• Ejecuta los .bat desde tools\.
-\t• Verifica que deps\ y rutas en los .bat coincidan con tu estructura.
+2. Compilación:
+   - Compila el código fuente usando MSVC.
+   - Genera el ejecutable en "bin/AItest.exe".
+   - Copia automáticamente las DLLs necesarias (SDL2) a la carpeta bin.
 
+3. Pregunta: "¿Ejecutar AItest.exe ahora? [S/N]"
+   - S: Inicia el juego inmediatamente.
+   - N: Termina el proceso sin abrir el juego.
 
-============================================================
-ENGLISH — How to compile & what each .bat does
-============================================================
+RESUMEN DE SCRIPTS DISPONIBLES
+------------------------------
+1. comp.bat (RECOMENDADO)
+   - Contiene todo: Limpieza (opcional) -> Compilación -> Ejecución (opcional).
 
-What to compile with
---------------------
-\t• Open: "x64 Native Tools Command Prompt for Visual Studio" (MSVC x64).
-\t• Go to your project’s tools\ folder.
+2. compile.bat
+   - Únicamente compila el código y mueve las DLLs. No pregunta ni ejecuta.
 
-comp.bat flow
--------------
-\t1) Prompt: "Clean first? [Y/N]"
-\t\t• Y  → runs clear.bat (or full variant if you implemented it).
-\t\t• N  → skips cleaning.
-\t2) Build with MSVC:
-\t\t• Produces bin\AItest.exe.
-\t\t• Copies SDL2.dll and SDL2_image.dll into bin\ (if a_
+3. clear.bat
+   - Limpia archivos basura (.obj, .pdb, .ilk) de las carpetas bin, build y tools.
+   - Usar "clear.bat all" para borrar también el ejecutable y las DLLs.
 
-
+SOLUCIÓN DE PROBLEMAS
+---------------------
+- Si falla la compilación, verificar que la carpeta "deps/" contiene SDL2 y SDL2_image correctamente.
+- Asegurarse de estar ejecutando los comandos desde la carpeta "tools/".
