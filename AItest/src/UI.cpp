@@ -112,6 +112,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   }
   if (ImGui::Button("Room", ImVec2(100, 35))) {
     currentBrush = (currentBrush == BrushMode::ROOM) ? BrushMode::NONE : BrushMode::ROOM;
+    if (currentBrush == BrushMode::ROOM) {
+      selectedMario = -1;   // Desactivar Move Goal
+      teleportMarioIndex = -1;   // Desactivar Teleport
+    }
   }
   ImGui::PopStyleColor();
   ImGui::SameLine();
@@ -126,6 +130,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   }
   if (ImGui::Button("Wall", ImVec2(100, 35))) {
     currentBrush = (currentBrush == BrushMode::WALL) ? BrushMode::NONE : BrushMode::WALL;
+    if (currentBrush == BrushMode::WALL) {
+      selectedMario = -1;        // Desactivar Move Goal
+      teleportMarioIndex = -1;   // Desactivar Teleport
+    }
   }
   ImGui::PopStyleColor();
   ImGui::SameLine();
@@ -140,6 +148,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   }
   if (ImGui::Button("Spawn", ImVec2(100, 35))) {
     currentBrush = (currentBrush == BrushMode::SPAWN) ? BrushMode::NONE : BrushMode::SPAWN;
+    if (currentBrush == BrushMode::SPAWN) {
+      selectedMario = -1;        // Desactivar Move Goal
+      teleportMarioIndex = -1;   // Desactivar Teleport
+    }
   }
   ImGui::PopStyleColor();
   ImGui::SameLine();
@@ -154,6 +166,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   }
   if (ImGui::Button("Goal", ImVec2(100, 35))) {
     currentBrush = (currentBrush == BrushMode::GOAL) ? BrushMode::NONE : BrushMode::GOAL;
+    if (currentBrush == BrushMode::GOAL) {
+      selectedMario = -1;        // Desactivar Move Goal
+      teleportMarioIndex = -1;   // Desactivar Teleport
+    }
   }
   ImGui::PopStyleColor();
   ImGui::SameLine();
@@ -168,6 +184,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   }
   if (ImGui::Button("Lava", ImVec2(100, 35))) {
     currentBrush = (currentBrush == BrushMode::LAVA) ? BrushMode::NONE : BrushMode::LAVA;
+    if (currentBrush == BrushMode::LAVA) {
+      selectedMario = -1;        // Desactivar Move Goal
+      teleportMarioIndex = -1;   // Desactivar Teleport
+    }
   }
   ImGui::PopStyleColor();
   ImGui::SameLine();
@@ -290,6 +310,8 @@ void RenderImGUI(SDL_Renderer* renderer,
       }
       else {
         selectedMario = i;  // Seleccionar este Mario
+        currentBrush = BrushMode::NONE;  // Desactivar brush
+        teleportMarioIndex = -1;  // Desactivar modo teleport
       }
     }
 

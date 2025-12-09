@@ -101,6 +101,7 @@ int main(int argc, char* argv[]) {
               // Solo permite cambiar objetivo si esta VIVO (state == 1)
               if (runners[selectedMario].state == 1) {
                 SetRunnerGoal(selectedMario, gridX, gridY);
+                selectedMario = -1;
               }
             }
           }
