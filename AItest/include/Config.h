@@ -39,3 +39,11 @@ enum class BrushMode {
   LAVA = 3,     // Rejilla/Lava (empieza abierta, se alterna)
   SPAWN = 5
 };
+
+// Enum para modos de interaccion con el mapa
+enum class InteractionMode {
+  NONE,        // Sin modo activo
+  EDIT_MAP,    // Editando el mapa con brush
+  MOVE_GOAL,   // Moviendo objetivo de un Mario
+  TELEPORT     // Teletransportando un Mario
+};

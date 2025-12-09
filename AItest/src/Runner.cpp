@@ -55,6 +55,7 @@ void InitRunners() {
     runners[i].behaviour = 1;
     runners[i].direction = 2;
     runners[i].state = 1;
+    runners[i].algorithm = MovementAlgorithm::RANDOM;  // Reset algoritmo a Random
 
     runners[i].lifeTime = 0.0f;
     runners[i].currentAlgoTime = 0.0f;
@@ -230,7 +231,7 @@ bool FindGoalPosition(int& goalX, int& goalY) {
 bool CalculateAStarPath(Runner& runner) {
   int goalX, goalY;
 
-  // Usa objetivo personalizado (siempre esta definido ahora)
+  // Usa objetivo personalizado (siempre esta definido)
   goalX = runner.goalX;
   goalY = runner.goalY;
 
@@ -415,7 +416,7 @@ static void UpdateRunnerRandom(Runner& r)
     }
   }
 }
-// SEEK TONTO: siempre intenta reducir la distancia Manhattan al goal
+// SEEK TONTO siempre intenta reducir la distancia Manhattan al goal
 static void UpdateRunnerSeekDumb(Runner& r)
 {
   if (r.goalX == -1 || r.goalY == -1) {
@@ -428,7 +429,7 @@ static void UpdateRunnerSeekDumb(Runner& r)
   int bestY = r.y;
   int bestDist = abs(r.x - r.goalX) + abs(r.y - r.goalY);
 
-  // Vecinos: arriba, abajo, izquierda, derecha
+  // Vecinos arriba, abajo, izquierda, derecha
   const int dx[4] = { 0,  0, -1, 1 };
   const int dy[4] = { -1, 1,  0, 0 };
 
@@ -707,7 +708,7 @@ void UpdateRunners(float deltaTime, float& currentRunnerTime, float runnerTimer)
           break;
 
         case MovementAlgorithm::SEEK_SMART:
-				case MovementAlgorithm::SCATTER:
+        case MovementAlgorithm::SCATTER:
           UpdateRunnerSeekSmart(runners[i]);
           break;
 
@@ -747,10 +748,10 @@ void SetRunnerAlgorithm(int runnerIndex, MovementAlgorithm algorithm) {
     if (runners[runnerIndex].algorithm != algorithm) {
       runners[runnerIndex].currentAlgoTime = 0.0f;
     }
-		if (algorithm == MovementAlgorithm::SCATTER) {
-			// Asigna un objetivo aleatorio al cambiar a SCATTER
-			AssignRandomGoalToRunner(runners[runnerIndex]);
-		}
+    if (algorithm == MovementAlgorithm::SCATTER) {
+      // Asigna un objetivo aleatorio al cambiar a SCATTER
+      AssignRandomGoalToRunner(runners[runnerIndex]);
+    }
     runners[runnerIndex].algorithm = algorithm;
     runners[runnerIndex].pathLength = 0;  // Reset path por si venia de A* o lo usamos despues
     runners[runnerIndex].pathIndex = 0;
@@ -817,7 +818,7 @@ void TeleportRunner(int runnerIndex, int x, int y) {
   runners[runnerIndex].x = x;
   runners[runnerIndex].y = y;
 
-  // Resetear "memoria" para algoritmos Seek
+  // Resetear memoria para algoritmos Seek
   runners[runnerIndex].lastX = x;
   runners[runnerIndex].lastY = y;
 

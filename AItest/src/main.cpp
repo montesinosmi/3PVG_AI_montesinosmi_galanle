@@ -20,14 +20,13 @@ float RunnerTimer = kDefaultRunnerTimer;
 float CurrentWorldTime = 0.0f;
 float CurrentRunnerTime = 0.0f;
 
-// Variable global para el Mario seleccionado (-1 = ninguno)
-int selectedMario = -1;
+// Sistema unificado de interaccion con el mapa
+InteractionMode currentInteractionMode = InteractionMode::NONE;
 
-// Variable global para el brush del editor de mapa
-BrushMode currentBrush = BrushMode::NONE;
-
-// Variable global para el Mario en modo teleport (-1 = ninguno)
-int teleportMarioIndex = -1;
+// Variables de estado (solo validas segun el modo activo)
+BrushMode currentBrush = BrushMode::NONE;      // Solo valido si mode == EDIT_MAP
+int selectedMario = -1;                         // Solo valido si mode == MOVE_GOAL
+int teleportMarioIndex = -1;                    // Solo valido si mode == TELEPORT
 
 int main(int argc, char* argv[]) {
   //srand(time(NULL));
@@ -78,31 +77,50 @@ int main(int argc, char* argv[]) {
           // Valida que las coordenadas esten dentro del mapa
           if (gridX >= 0 && gridX < kMapWidth && gridY >= 0 && gridY < kMapHeight) {
 
-            // PRIORIDAD 1: Modo Teleport activo
-            if (teleportMarioIndex >= 0 && teleportMarioIndex < kRunnerQuantity) {
-              TeleportRunner(teleportMarioIndex, gridX, gridY);
-              teleportMarioIndex = -1;  // Desactivar modo teleport
-            }
-            // PRIORIDAD 2: Editor de mapa (si hay brush seleccionado)
-            else if (currentBrush != BrushMode::NONE) {
-              int type = static_cast<int>(currentBrush);
-              bool transitable = true;
+            // Switch segun el modo de interaccion activo
+            switch (currentInteractionMode) {
 
-              // Lava/Rejilla siempre empieza abierta (transitable = true)
-              if (currentBrush == BrushMode::LAVA) {
-                type = 3;
-                transitable = true;
+            case InteractionMode::TELEPORT:
+              if (teleportMarioIndex >= 0 && teleportMarioIndex < kRunnerQuantity) {
+                TeleportRunner(teleportMarioIndex, gridX, gridY);
+                // Desactivar modo teleport
+                teleportMarioIndex = -1;
+                currentInteractionMode = InteractionMode::NONE;
               }
+              break;
 
-              SetCellType(gridX, gridY, type, transitable);
-            }
-            // PRIORIDAD 3: Establecer objetivo de Mario (si hay Mario seleccionado)
-            else if (selectedMario >= 0 && selectedMario < kRunnerQuantity) {
-              // Solo permite cambiar objetivo si esta VIVO (state == 1)
-              if (runners[selectedMario].state == 1) {
-                SetRunnerGoal(selectedMario, gridX, gridY);
-                selectedMario = -1;
+            case InteractionMode::EDIT_MAP:
+              if (currentBrush != BrushMode::NONE) {
+                int type = static_cast<int>(currentBrush);
+                bool transitable = true;
+
+                // Lava/Rejilla siempre empieza abierta, transitable = true
+                if (currentBrush == BrushMode::LAVA) {
+                  type = 3;
+                  transitable = true;
+                }
+
+                SetCellType(gridX, gridY, type, transitable);
+                // Modo editor permanece activo, no se desactiva tras un click
               }
+              break;
+
+            case InteractionMode::MOVE_GOAL:
+              if (selectedMario >= 0 && selectedMario < kRunnerQuantity) {
+                // Solo permite cambiar objetivo si esta VIVO (state == 1)
+                if (runners[selectedMario].state == 1) {
+                  SetRunnerGoal(selectedMario, gridX, gridY);
+                  // Desactivar modo Move Goal
+                  selectedMario = -1;
+                  currentInteractionMode = InteractionMode::NONE;
+                }
+              }
+              break;
+
+            case InteractionMode::NONE:
+            default:
+              // No hay modo activo, no hacer nada
+              break;
             }
           }
         }
@@ -121,7 +139,7 @@ int main(int argc, char* argv[]) {
     DrawGoalFlags(renderer);  // Dibuja banderas ANTES de los runners para que aparezcan debajo
     DrawRunners(renderer);
     RenderImGUI(renderer, WorldTimer, RunnerTimer, CurrentWorldTime, CurrentRunnerTime,
-      selectedMario, currentBrush, teleportMarioIndex);
+      currentInteractionMode, selectedMario, currentBrush, teleportMarioIndex);
 
     SDL_RenderPresent(renderer);
     SDL_Delay(10);

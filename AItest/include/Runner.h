@@ -6,7 +6,7 @@
 enum class MovementAlgorithm {
   RANDOM = 0,
   A_STAR = 1,
-  SEEK_DUMB = 2,   // Seek tipo Pac-Man, greedy
+  SEEK_DUMB = 2,   // Seek tipo PacMan, greedy
   SEEK_SMART = 3,    // Seek mejorado (evita reversas)
   SCATTER = 4,    // Seek mejorado (evita reversas)
   FLEE = 5    // Seek mejorado (evita reversas)

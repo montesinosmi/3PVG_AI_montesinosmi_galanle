@@ -12,6 +12,7 @@ void PositionSizeImGUI(float pos_x, float pos_y, float size_x, float size_y);
 void RenderImGUI(SDL_Renderer* renderer,
   float& worldTimer, float& runnerTimer,
   float currentWorldTime, float currentRunnerTime,
+  InteractionMode& currentMode,
   int& selectedMario,
   BrushMode& currentBrush,
   int& teleportMarioIndex);

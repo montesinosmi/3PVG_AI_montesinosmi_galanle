@@ -24,12 +24,16 @@ void PositionSizeImGUI(float pos_x, float pos_y, float size_x, float size_y) {
 void RenderImGUI(SDL_Renderer* renderer,
   float& worldTimer, float& runnerTimer,
   float currentWorldTime, float currentRunnerTime,
+  InteractionMode& currentMode,
   int& selectedMario,
   BrushMode& currentBrush,
   int& teleportMarioIndex) {
   ImGui_ImplSDL2_NewFrame();
   ImGui_ImplSDLRenderer2_NewFrame();
   ImGui::NewFrame();
+
+  // Variable static para el selector global de algoritmo
+  static int globalAlgoIndex = 0;
 
   float worldSeconds = worldTimer / 1000.0f;
   float runnerSeconds = runnerTimer / 1000.0f;
@@ -111,10 +115,17 @@ void RenderImGUI(SDL_Renderer* renderer,
     ImGui::PushStyleColor(ImGuiCol_Button, roomColor);
   }
   if (ImGui::Button("Room", ImVec2(100, 35))) {
-    currentBrush = (currentBrush == BrushMode::ROOM) ? BrushMode::NONE : BrushMode::ROOM;
     if (currentBrush == BrushMode::ROOM) {
-      selectedMario = -1;   // Desactivar Move Goal
-      teleportMarioIndex = -1;   // Desactivar Teleport
+      // Toggle OFF: desactivar brush
+      currentBrush = BrushMode::NONE;
+      currentMode = InteractionMode::NONE;
+    }
+    else {
+      // Toggle ON: activar brush y desactivar otros modos
+      currentBrush = BrushMode::ROOM;
+      currentMode = InteractionMode::EDIT_MAP;
+      selectedMario = -1;
+      teleportMarioIndex = -1;
     }
   }
   ImGui::PopStyleColor();
@@ -129,10 +140,17 @@ void RenderImGUI(SDL_Renderer* renderer,
     ImGui::PushStyleColor(ImGuiCol_Button, wallColor);
   }
   if (ImGui::Button("Wall", ImVec2(100, 35))) {
-    currentBrush = (currentBrush == BrushMode::WALL) ? BrushMode::NONE : BrushMode::WALL;
     if (currentBrush == BrushMode::WALL) {
-      selectedMario = -1;        // Desactivar Move Goal
-      teleportMarioIndex = -1;   // Desactivar Teleport
+      // Toggle OFF: desactivar brush
+      currentBrush = BrushMode::NONE;
+      currentMode = InteractionMode::NONE;
+    }
+    else {
+      // Toggle ON: activar brush y desactivar otros modos
+      currentBrush = BrushMode::WALL;
+      currentMode = InteractionMode::EDIT_MAP;
+      selectedMario = -1;
+      teleportMarioIndex = -1;
     }
   }
   ImGui::PopStyleColor();
@@ -147,10 +165,17 @@ void RenderImGUI(SDL_Renderer* renderer,
     ImGui::PushStyleColor(ImGuiCol_Button, spawnColor);
   }
   if (ImGui::Button("Spawn", ImVec2(100, 35))) {
-    currentBrush = (currentBrush == BrushMode::SPAWN) ? BrushMode::NONE : BrushMode::SPAWN;
     if (currentBrush == BrushMode::SPAWN) {
-      selectedMario = -1;        // Desactivar Move Goal
-      teleportMarioIndex = -1;   // Desactivar Teleport
+      // Toggle OFF: desactivar brush
+      currentBrush = BrushMode::NONE;
+      currentMode = InteractionMode::NONE;
+    }
+    else {
+      // Toggle ON: activar brush y desactivar otros modos
+      currentBrush = BrushMode::SPAWN;
+      currentMode = InteractionMode::EDIT_MAP;
+      selectedMario = -1;
+      teleportMarioIndex = -1;
     }
   }
   ImGui::PopStyleColor();
@@ -165,10 +190,17 @@ void RenderImGUI(SDL_Renderer* renderer,
     ImGui::PushStyleColor(ImGuiCol_Button, goalColor);
   }
   if (ImGui::Button("Goal", ImVec2(100, 35))) {
-    currentBrush = (currentBrush == BrushMode::GOAL) ? BrushMode::NONE : BrushMode::GOAL;
     if (currentBrush == BrushMode::GOAL) {
-      selectedMario = -1;        // Desactivar Move Goal
-      teleportMarioIndex = -1;   // Desactivar Teleport
+      // Toggle OFF: desactivar brush
+      currentBrush = BrushMode::NONE;
+      currentMode = InteractionMode::NONE;
+    }
+    else {
+      // Toggle ON: activar brush y desactivar otros modos
+      currentBrush = BrushMode::GOAL;
+      currentMode = InteractionMode::EDIT_MAP;
+      selectedMario = -1;
+      teleportMarioIndex = -1;
     }
   }
   ImGui::PopStyleColor();
@@ -183,10 +215,17 @@ void RenderImGUI(SDL_Renderer* renderer,
     ImGui::PushStyleColor(ImGuiCol_Button, lavaColor);
   }
   if (ImGui::Button("Lava", ImVec2(100, 35))) {
-    currentBrush = (currentBrush == BrushMode::LAVA) ? BrushMode::NONE : BrushMode::LAVA;
     if (currentBrush == BrushMode::LAVA) {
-      selectedMario = -1;        // Desactivar Move Goal
-      teleportMarioIndex = -1;   // Desactivar Teleport
+      // Toggle OFF: desactivar brush
+      currentBrush = BrushMode::NONE;
+      currentMode = InteractionMode::NONE;
+    }
+    else {
+      // Toggle ON: activar brush y desactivar otros modos
+      currentBrush = BrushMode::LAVA;
+      currentMode = InteractionMode::EDIT_MAP;
+      selectedMario = -1;
+      teleportMarioIndex = -1;
     }
   }
   ImGui::PopStyleColor();
@@ -202,8 +241,10 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
   if (ImGui::Button("RESET MAP", ImVec2(335, 30))) {
     ResetMap();
-    currentBrush = BrushMode::NONE;  // Deselecciona brush al resetear
-    teleportMarioIndex = -1;  // Desactiva modo teleport
+    currentBrush = BrushMode::NONE;
+    selectedMario = -1;
+    teleportMarioIndex = -1;
+    currentMode = InteractionMode::NONE;
   }
   ImGui::PopStyleColor(2);
 
@@ -230,9 +271,11 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.4f, 1.0f, 0.4f, 1.0f));
   if (ImGui::Button("RESTART GAME", ImVec2(335, 30))) {
     RestartGame();
-    currentBrush = BrushMode::NONE;  // Deselecciona brush
-    selectedMario = -1;  // Deselecciona Mario
-    teleportMarioIndex = -1;  // Desactiva modo teleport
+    currentBrush = BrushMode::NONE;
+    selectedMario = -1;
+    teleportMarioIndex = -1;
+    currentMode = InteractionMode::NONE;
+    globalAlgoIndex = 0;  // Reset algoritmo global a Random
   }
   ImGui::PopStyleColor(3);
 
@@ -306,12 +349,16 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     if (ImGui::Button(isSelected ? ">>>" : "Move Goal", ImVec2(70, 0))) {
       if (selectedMario == i) {
-        selectedMario = -1; // Deseleccionar si ya estaba seleccionado
+        // Toggle OFF: deseleccionar Mario
+        selectedMario = -1;
+        currentMode = InteractionMode::NONE;
       }
       else {
-        selectedMario = i;  // Seleccionar este Mario
-        currentBrush = BrushMode::NONE;  // Desactivar brush
-        teleportMarioIndex = -1;  // Desactivar modo teleport
+        // Toggle ON: seleccionar este Mario y desactivar otros modos
+        selectedMario = i;
+        currentMode = InteractionMode::MOVE_GOAL;
+        currentBrush = BrushMode::NONE;
+        teleportMarioIndex = -1;
       }
     }
 
@@ -408,12 +455,16 @@ void RenderImGUI(SDL_Renderer* renderer,
 
     if (ImGui::Button("Teleport Mario##tp")) {
       if (teleportMarioIndex == i) {
-        teleportMarioIndex = -1;  // Desactivar modo TP
+        // Toggle OFF: desactivar modo TP
+        teleportMarioIndex = -1;
+        currentMode = InteractionMode::NONE;
       }
       else {
-        teleportMarioIndex = i;   // Activar modo TP
-        currentBrush = BrushMode::NONE;  // Desactivar brush
-        selectedMario = -1;  // Desactivar goal selection
+        // Toggle ON: activar modo TP y desactivar otros modos
+        teleportMarioIndex = i;
+        currentMode = InteractionMode::TELEPORT;
+        currentBrush = BrushMode::NONE;
+        selectedMario = -1;
       }
     }
 
@@ -489,7 +540,6 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::Spacing();
 
   // Selector de algoritmo global
-  static int globalAlgoIndex = 0;
   const char* algoNames[] = { "Random", "A*", "Seek", "Seek+", "Scatter", "Flee" };
 
   ImGui::Text("Algorithm:");
