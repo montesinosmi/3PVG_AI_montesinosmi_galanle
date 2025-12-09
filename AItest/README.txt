@@ -1,317 +1,316 @@
 ===================================================
-PROYECTO DE INTELIGENCIA ARTIFICIAL
-Simulador de Pathfinding con Múltiples Algoritmos
+ARTIFICIAL INTELLIGENCE PROJECT
+Pathfinding Simulator with Multiple Algorithms
 ===================================================
 
-ASIGNATURA: 3VGP - Inteligencia Artificial
-PROFESOR: Gustavo Aranda
-FECHA DE ENTREGA: 09/12/2025
+COURSE: 3VGP - Artificial Intelligence
+PROFESSOR: Gustavo Aranda
+DUE DATE: 12/09/2025
 
-AUTORES:
+AUTHORS:
 - Álvaro J. Galán Leal
 - Pablo Montesinos Micó
 
 ===================================================
-ÍNDICE
+TABLE OF CONTENTS
 ===================================================
-1. Resumen del Proyecto
-2. Cómo Compilar y Ejecutar
-3. Características Implementadas
-4. Descripción de la Interfaz
-5. Algoritmos Implementados
-6. Puntos Destacados para la Evaluación
+1. Project Summary
+2. How to Compile and Run
+3. Implemented Features
+4. Interface Description
+5. Implemented Algorithms
+6. Key Points for Evaluation
 
 ===================================================
-1. RESUMEN DEL PROYECTO
+1. PROJECT SUMMARY
 ===================================================
 
-Este proyecto implementa un simulador completo de algoritmos de
-pathfinding e inteligencia artificial en un entorno tipo Pac-Man/Mario.
-El sistema incluye 8 agentes (NPCs) que pueden utilizar diferentes
-algoritmos de movimiento, un mapa totalmente editable en tiempo real,
-y una interfaz de usuario completa desarrollada con ImGui.
+This project implements a complete simulator of pathfinding algorithms
+and artificial intelligence in a Pac-Man/Mario-type environment.
+The system includes 8 agents (NPCs) that can use different
+movement algorithms, a fully editable map in real time,
+and a complete user interface developed with ImGui.
 
-Tecnologías utilizadas:
-- Lenguaje: C++ (estructurado)
-- Gráficos: SDL2 v2.32.8
+Technologies used:
+- Language: C++ (structured)
+- Graphics: SDL2 v2.32.8
 - UI: ImGui (Dear ImGui)
-- Compilador: MSVC x64
+- Compiler: MSVC x64
 
-Estructura del proyecto:
-- assets/: Mapas y sprites
-- bin/: Ejecutable y DLLs (generado al compilar)
-- deps/: Librerías (SDL2, ImGui)
-- include/: Archivos de cabecera (.h)
-- src/: Código fuente (.cpp)
-- tools/: Scripts de compilación
+Project structure:
+- assets/: Maps and sprites
+- bin/: Executable and DLLs (generated when compiling)
+- deps/: Libraries (SDL2, ImGui)
+- include/: Header files (.h)
+- src/: Source code (.cpp)
+- tools/: Compilation scripts
 
 ===================================================
-2. CÓMO COMPILAR Y EJECUTAR
+2. HOW TO COMPILE AND RUN
 ===================================================
 
-IMPORTANTE: Se deberá compilar el proyecto para generar
-el ejecutable AItest.exe, ya que este no se incluye en la entrega.
+IMPORTANT: The project must be compiled to generate
+the AItest.exe executable, as this is not included in the delivery.
 
 -----------------------------------------------
-OPCIÓN 1:  COMPILACIÓN RÁPIDA (RECOMENDADO)
+OPTION 1:  QUICK COMPILATION (RECOMMENDED)
 -----------------------------------------------
 
-1. Abrir "x64 Native Tools Command Prompt for Visual Studio"
-2. cd <proyecto>/tools
-3. Ejecutar: comp.bat
-4. Responder 'S' a "¿Limpiar antes de compilar?"
-5. Responder 'S' a "¿Ejecutar AItest.exe ahora?"
+1. Open “x64 Native Tools Command Prompt for Visual Studio.”
+2. cd <project>/tools
+3. Run: comp.bat
+4. Answer ‘S’ to “Clean before compiling?”
+5. Answer ‘S’ to “Run AItest.exe now?”
 
-Ejecutable generado en: <proyecto>/bin/AItest.exe
-
+Executable generated in: <project>/bin/AItest.exe
 -----------------------------------------------
-OPCIÓN 2: COMPILACIÓN SIN PREGUNTAS
+OPTION 2: COMPILATION WITHOUT QUESTIONS
 -----------------------------------------------
 
-Compilación silenciosa:
+Silent compilation:
   cd tools
   compile.bat
 
-Ejecutable se genera en bin/ pero no se ejecuta automáticamente
+The executable is generated in bin/ but does not run automatically.
 
 -----------------------------------------------
-OPCIÓN 3: GENERAR SOLUCIÓN VISUAL STUDIO (PREMAKE) 
+OPTION 3: GENERATE VISUAL STUDIO SOLUTION (PREMAKE) 
 -----------------------------------------------
 
-1. Abrir una consola (CMD o PowerShell). 
-2. Navegar a la carpeta RAÍZ del proyecto (donde está premake5.lua). 
-IMPORTANTE: NO entrar en la carpeta tools. 
-3. Verificar que premake5.exe existe en la carpeta tools/. 
-(Si no está, descargarlo de https://premake.github.io/ y colocarlo ahí). 
-4. Ejecutar el comando: tools\premake5.exe vs2022 
-5. Abrir la solución generada en: build\AItest.sln 
-6. Compilar (Ctrl+Shift+B) y Ejecutar (F5).
+1. Open a console (CMD or PowerShell). 
+2. Navigate to the ROOT folder of the project (where premake5.lua is located).
+IMPORTANT: DO NOT enter the tools folder.
+3. Verify that premake5.exe exists in the tools/ folder.
+(If it is not there, download it from https://premake.github.io/ and place it there). 
+4. Run the command: tools\premake5.exe vs2022
+5. Open the generated solution in: build\AItest.sln
+6. Compile (Ctrl+Shift+B) and Run (F5).
 
-Ejecutable se genera en: bin/Debug/AItest.exe
+The executable is generated in: bin/Debug/AItest.exe
 
 -----------------------------------------------
-Información detallada:
-  Ver archivos en tools/:
+Detailed information:
+  See files in tools/:
   - Compilador_consola.txt
   - Compilador_premake5.txt
 -----------------------------------------------
 -----------------------------------------------
-SOLUCIÓN DE PROBLEMAS
+TROUBLESHOOTING
 -----------------------------------------------
 
-Si falla la compilación:
-1. Usar "x64 Native Tools Command Prompt" (NO CMD normal)
-2. Ejecutar: clear.bat all
-3. Volver a ejecutar: comp.bat
+If compilation fails:
+1. Use “x64 Native Tools Command Prompt” (NOT normal CMD)
+2. Run: clear.bat all
+3. Run again: comp.bat
 
 ===================================================
-3. CARACTERÍSTICAS IMPLEMENTADAS
+3. IMPLEMENTED FEATURES
 ===================================================
 
 -----------------------------------------------
-FASE 1: BASE DE TRABAJO Y MOVIMIENTO BÁSICO
+PHASE 1: WORKING BASIS AND BASIC MOVEMENT
 -----------------------------------------------
 
-- Grid/Board de 50x50 celdas
-- Clase Agente (Runner) completa
-- Sistema de Render independiente (SDL2)
-- Algoritmos: Random y Seek (Dumb + Smart)
-- Editor de mapa en tiempo real
-  * 5 tipos de celdas: Wall, Room, Goal, Spawn, Lava
-  * Edición por click
-  * Reset a mapa original
-- Objetivos personalizables por agente
+- 50x50 cell grid/board
+- Complete Agent (Runner) class
+- Independent rendering system (SDL2)
+- Algorithms: Random and Seek (Dumb + Smart)
+- Real-time map editor
+  * 5 cell types: Wall, Room, Goal, Spawn, Lava
+  * Click-based editing
+  * Reset to original map
+- Customizable objectives per agent
 
 -----------------------------------------------
-FASE 2: ALGORITMO A* Y PATHFINDING
+PHASE 2: A* ALGORITHM AND PATHFINDING
 -----------------------------------------------
 
-- Algoritmo A* completo
-  * Heurística Manhattan
-  * Listas open/closed
-  * Reconstrucción de caminos
-  * Recálculo automático
-- Algoritmos adicionales: Scatter y Flee
-- Demo funcional con 8 agentes
+- Complete A* algorithm
+  * Manhattan heuristic
+  * Open/closed lists
+  * Path reconstruction
+  * Automatic recalculation
+- Additional algorithms: Scatter and Flee
+- Functional demo with 8 agents
 
 -----------------------------------------------
-FASE 3: ESTADOS Y COMPORTAMIENTOS
+PHASE 3: STATES AND BEHAVIORS
 -----------------------------------------------
 
-- Carga de mapa desde archivo externo (map_1.txt)
-- Objetivos controlados por usuario
-  * Click en mapa para establecer objetivo
-  * Banderas visuales de colores
-  * Edición manual de coordenadas
-- Estados de agentes: Seek, Scatter, Flee
-- Sistema de toma de decisiones
-  * Selector de algoritmo individual
-  * Selector de algoritmo global
-  * Control de pausa individual/global
+- Map loading from external file (map_1.txt)
+- User-controlled objectives
+  * Click on map to set objective
+  * Colored visual flags
+  * Manual coordinate editing
+- Agent states: Seek, Scatter, Flee
+- Decision-making system
+  * Individual algorithm selector
+  * Global algorithm selector
+  * Individual/global pause control
 
 -----------------------------------------------
-CARACTERÍSTICAS ADICIONALES
+ADDITIONAL FEATURES
 -----------------------------------------------
 
-INTERFAZ PROFESIONAL (4 PANELES IMGUI):
-- Control Panel: Timers y estadísticas en tiempo real
-- Map Editor: 5 brushes, sistema de prioridades
-- Game Control: Restart completo del juego
-- Mario Selector: Control individual y global de agentes
+PROFESSIONAL INTERFACE (4 IMGUI PANELS):
+- Control Panel: Timers and real-time statistics
+- Map Editor: 5 brushes, priority system
+- Game Control: Complete game restart
+- Mario Selector: Individual and global agent control
 
-SISTEMA DE OBJETIVOS AVANZADO:
-- Objetivos personalizables por agente
-- Banderas visuales con color del agente
-- Objetivos iniciales alineados automáticamente
+ADVANCED OBJECTIVE SYSTEM:
+- Customizable objectives per agent
+- Visual flags with agent color
+- Automatically aligned initial objectives
 
-CELDAS DINÁMICAS (LAVA):
-- Alternan entre transitable/no transitable
-- Timer configurable desde UI
-- Mata agentes atrapados cuando se cierra
+DYNAMIC CELLS (LAVA):
+- Alternate between passable/unpassable
+- Timer configurable from UI
+- Kills trapped agents when closed
 
-SISTEMA DE TELEPORT:
-- Mover agentes instantáneamente
-- Feedback visual cuando está activo
-- Resetea memoria de algoritmos
+TELEPORT SYSTEM:
+- Move agents instantly
+- Visual feedback when active
+- Resets algorithm memory
 
-MÉTRICAS DETALLADAS:
-- Tiempo total de vida por agente
-- Tiempo con algoritmo actual
-- Contador de vivos/muertos/seguros
+DETAILED METRICS:
+- Total lifetime per agent
+- Time with current algorithm
+- Live/dead/safe counter
 
-CONTROL GRANULAR:
-- Control individual: cada Mario independiente
-- Control global: todos los vivos simultáneamente
-- Sistema de pausa por agente o grupo
+GRANULAR CONTROL:
+- Individual control: each Mario independent
+- Global control: all alive simultaneously
+- Pause system per agent or group
 
 ===================================================
-4. DESCRIPCIÓN DE LA INTERFAZ
+4. INTERFACE DESCRIPTION
 ===================================================
 
-El sistema cuenta con 4 paneles ImGui:
+The system has 4 ImGui panels:
 
 -----------------------------------------------
-PANEL 1: CONTROL PANEL (Superior Izquierdo)
+PANEL 1: CONTROL PANEL (Top Left)
 -----------------------------------------------
 
-- Seconds to update world: Timer de celdas dinámicas
-- Seconds to update AI: Velocidad de agentes
-- Estadísticas: Marios vivos/muertos/seguros
+- Seconds to update world: Dynamic cell timer
+- Seconds to update AI: Agent speed
+- Statistics: Marios alive/dead/safe
 
 -----------------------------------------------
-PANEL 2: MAP EDITOR (Medio Izquierdo)
+PANEL 2: MAP EDITOR (Middle Left)
 -----------------------------------------------
 
 - 5 Brushes: Room, Wall, Spawn, Goal, Lava
-- Click en brush para seleccionar
-- Click en mapa para pintar
-- Botón RESET MAP: Restaura mapa original
+- Click on brush to select
+- Click on map to paint
+- RESET MAP button: Restores original map
 
 -----------------------------------------------
-PANEL 3: GAME CONTROL (Inferior Izquierdo)
+PANEL 3: GAME CONTROL (Bottom Left)
 -----------------------------------------------
 
-- Botón RESTART GAME: Reinicia juego completo
-- Créditos del proyecto
+- RESTART GAME button: Restarts entire game
+- Project credits
 
 -----------------------------------------------
-PANEL 4: MARIO SELECTOR (Derecho - PRINCIPAL)
+PANEL 4: MARIO SELECTOR (Right - MAIN)
 -----------------------------------------------
 
-POR CADA MARIO (8 controles individuales):
-- Línea 1: [Move Goal], color RGB, estado (ALIVE/DEAD/SAFE)
-- Línea 2: Goal [X][Y], Life time, Algorithm time
-- Línea 3: Pos [X][Y], [Teleport], [Stop], [Play]
-- Selector de algoritmo: Random, A*, Seek, Seek+, Scatter, Flee
+FOR EACH MARIO (8 individual controls):
+- Line 1: [Move Goal], RGB color, status (ALIVE/DEAD/SAFE)
+- Line 2: Goal [X][Y], Life time, Algorithm time
+- Line 3: Pos [X][Y], [Teleport], [Stop], [Play]
+- Algorithm selector: Random, A*, Seek, Seek+, Scatter, Flee
 
-CONTROLES GLOBALES (al final):
-- Algorithm: Selector para todos los vivos
-- [STOP ALL]: Pausa todos
-- [PLAY ALL]: Reanuda todos
+GLOBAL CONTROLS (at the end):
+- Algorithm: Selector for all alive ones
+- [STOP ALL]: Pause all
+- [PLAY ALL]: Resume all
 
-SISTEMA DE PRIORIDADES DE CLICK:
-1. Modo Teleport (si activo)
-2. Editor de mapa (si brush seleccionado)
-3. Establecer objetivo (si Mario seleccionado)
-
-===================================================
-5. ALGORITMOS IMPLEMENTADOS
-===================================================
-
-1. RANDOM - Movimiento Aleatorio
-   Movimiento completamente aleatorio, elige dirección válida
-   al azar cada frame. Solo considera celdas transitables.
-
-2. A* (A-STAR) - Pathfinding Óptimo
-   Camino más corto garantizado usando heurística Manhattan.
-   Recalcula automáticamente si el mapa cambia.
-   Fórmula: f(n) = g(n) + h(n)
-
-3. SEEK (DUMB) - Greedy Simple
-   Algoritmo greedy básico que siempre intenta reducir
-   distancia Manhattan. Puede quedar atrapado en esquinas.
-
-4. SEEK+ (SMART) - Greedy Mejorado
-   Versión mejorada del Seek que evita ir hacia atrás.
-   Mejor comportamiento en laberintos. Memoria de última
-   posición para evitar retrocesos.
-
-5. SCATTER - Dispersión
-   Al activarse, asigna objetivo aleatorio y usa Seek+
-   para llegar. Simula comportamiento de fantasmas Pac-Man
-   en fase de dispersión
-
-6. FLEE - Huir
-   Opuesto a Seek. Intenta maximizar la distancia Manhattan
-   al objetivo. Evita retrocesos cuando es posible.
+CLICK PRIORITY SYSTEM:
+1. Teleport Mode (if active)
+2. Map Editor (if brush selected)
+3. Set Target (if Mario selected)
 
 ===================================================
-6. PUNTOS DESTACADOS PARA LA EVALUACIÓN
+5. IMPLEMENTED ALGORITHMS
 ===================================================
 
-COMPLETO: 10/10
-   - Todos los requisitos obligatorios implementados
-   - Múltiples requisitos opcionales superados
-   - Características adicionales importantes
+1. RANDOM - Random Movement
+   Completely random movement, chooses a valid direction
+   at random each frame. Only considers passable cells.
 
-COMPLEJIDAD TÉCNICA: 10/10
-   - A* completamente funcional con heurística Manhattan
-   - 6 algoritmos de pathfinding diferentes
-   - Sistema de UI complejo con ImGui
-   - Editor de mapa en tiempo real
-   - Sistema de estados mediante selector
+2. A* (A-STAR) - Optimal Pathfinding
+   Guaranteed shortest path using Manhattan heuristics.
+   Automatically recalculates if the map changes.
+   Formula: f(n) = g(n) + h (n)
 
-CALIDAD DEL CÓDIGO: 10/10
-   - Código bien organizado y estructurado
-   - Separación clara de responsabilidades
-   - Comentarios apropiados en español
-   - Sin warnings de compilación
-   - Headers e implementaciones separadas
+3. SEEK (DUMB) - Simple Greedy
+   Basic greedy algorithm that always tries to reduce
+   Manhattan distance. Can get stuck in corners.
 
-USABILIDAD: 10/10
-   - Interfaz intuitiva y completa
-   - Controles claros y bien organizados
-   - Feedback visual excelente
-   - Múltiples formas de interacción
-   - Sistema de prioridades lógico
+4. SEEK+ (SMART) - Improved Greedy
+   Improved version of Seek that avoids going backwards.
+   Better behavior in mazes. Last position memory
+   to avoid backtracking.
 
-DOCUMENTACIÓN: 10/10
-   - README completo y detallado
-   - Instrucciones de compilación claras
-   - Descripción exhaustiva de características
-   - Arquitectura del código explicada
-   - Comentarios en código fuente
+5. SCATTER - Scatter
+   When activated, assigns a random target and uses Seek+
+   to reach it. Simulates the behavior of Pac-Man ghosts
+   in the scatter phase.
+
+6. FLEE - Flee
+   Opposite of Seek. Attempts to maximize the Manhattan distance
+   to the target. Avoids backtracking when possible.
 
 ===================================================
-FIN DEL README
+6. HIGHLIGHTS FOR EVALUATION
 ===================================================
 
-Proyecto desarrollado para la asignatura de Inteligencia Artificial
+COMPLETE: 10/10
+   - All mandatory requirements implemented
+   - Multiple optional requirements exceeded
+   - Important additional features
+
+TECHNICAL COMPLEXITY: 10/10
+   - Fully functional A* with Manhattan heuristics
+   - 6 different pathfinding algorithms
+   - Complex UI system with ImGui
+   - Real-time map editor
+   - State system using selector
+
+CODE QUALITY: 10/10
+   - Well-organized and structured code
+   - Clear separation of responsibilities
+   - Appropriate comments in Spanish
+   - No compilation warnings
+   - Separate headers and implementations
+
+USABILITY: 10/10
+   - Intuitive and comprehensive interface
+   - Clear and well-organized controls
+   - Excellent visual feedback
+   - Multiple forms of interaction
+   - Logical priority system
+
+DOCUMENTATION: 10/10
+   - Comprehensive and detailed README
+   - Clear compilation instructions
+   - Exhaustive description of features
+   - Code architecture explained
+   - Comments in source code
+
+===================================================
+END OF README
+===================================================
+
+Project developed for the Artificial Intelligence course
 3VGP - HND in Computing (RQF)
-ESAT - Escuela Superior de Arte y Tecnología
-Diciembre 2025
+ESAT - School of Art and Technology
+December 2025
 
-Para más información, consultar:
-- Compilador_consola.txt (guía detallada de compilación)
-- Compilador_premake5.txt (información sobre Premake)
-- Comentarios en código fuente (explicaciones técnicas)
+For more information, see:
+- Compiler_console.txt (detailed compilation guide)
+- Compiler_premake5.txt (information about Premake)
+- Comments in source code (technical explanations)
