@@ -43,7 +43,8 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::PushItemWidth(100);
 
   ImGui::Text("=== WORLD SETTINGS ===");
-  ImGui::InputFloat("Seconds to update world", &worldSeconds, 0.0f, 10.0f, "%.2f");
+
+  ImGui::SliderFloat("Seconds to update world", &worldSeconds, 0.0f, 10.0f, "%.2f");
   ImGui::Text("Current World Step: %.2f", currentWorldTime / 1000);
 
   ImGui::Spacing();
@@ -51,12 +52,14 @@ void RenderImGUI(SDL_Renderer* renderer,
   ImGui::Spacing();
 
   ImGui::Text("=== AI SETTINGS ===");
-  ImGui::InputFloat("Seconds to update AI", &runnerSeconds, 0.0f, 10.0f, "%.2f");
+
+  ImGui::SliderFloat("Seconds to update AI", &runnerSeconds, 0.0f, 10.0f, "%.2f");
   ImGui::Text("Current AI Step: %.2f", currentRunnerTime / 1000);
 
   ImGui::Spacing();
   ImGui::Separator();
   ImGui::Spacing();
+
 
   ImGui::Text("=== STATISTICS ===");
   ImGui::Text("Current Marios: %d", GetStateMarios(1));
